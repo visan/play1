@@ -22,9 +22,12 @@ class PlayApplication(object):
         self.path = application_path
         # only parse conf it is exists - if it should be there, it will be caught later 
         # (depends on command)
-        confExists = os.path.exists(os.path.join(self.path, 'conf', 'application.conf')); 
+        applicationConfDirPath=os.getenv('application_confdir_path', os.path.join(self.path, 'conf', ))
+        applicationConfFilename=os.getenv('application_conf_filename', 'application.conf')
+
+        confExists = os.path.exists(os.path.join(applicationConfDirPath, applicationConfFilename));
         if application_path is not None and confExists:
-            confFolder = os.path.join(application_path, 'conf/')
+            confFolder = os.path.join(applicationConfDirPath, './')
             try:
                 self.conf = PlayConfParser(confFolder, env)
             except Exception as err:
@@ -40,8 +43,10 @@ class PlayApplication(object):
 
     def check(self):
         try:
-            assert os.path.exists(os.path.join(self.path, 'conf', 'routes'))
-            assert os.path.exists(os.path.join(self.path, 'conf', 'application.conf'))
+            applicationConfDirPath=os.getenv('application_confdir_path', os.path.join(self.path, 'conf', ))
+            applicationConfFilename=os.getenv('application_conf_filename', 'application.conf')
+            assert os.path.exists(os.path.join(applicationConfDirPath, 'routes'))
+            assert os.path.exists(os.path.join(applicationConfDirPath, applicationConfFilename))
         except AssertionError:
             print "~ Oops. conf/routes or conf/application.conf missing."
             print "~ %s does not seem to host a valid application." % os.path.normpath(self.path)
@@ -300,7 +305,9 @@ class PlayConfParser:
 
     def __init__(self, confFolder, env):
         self.id = env["id"]
-        self.entries = self.readFile(confFolder, "application.conf")
+        applicationConfFilename=os.getenv('application_conf_filename', 'application.conf')
+
+        self.entries = self.readFile(confFolder, applicationConfFilename)
         if env.has_key('http.port'):
             self.entries['http.port'] = env['http.port']
 
