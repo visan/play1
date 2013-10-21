@@ -150,6 +150,12 @@ class PlayApplication(object):
         if os.path.exists(os.path.join(self.path, 'lib')):
             self.find_and_add_all_jars(classpath, os.path.join(self.path, 'lib'))
 
+        stat_classpath=os.path.join(self.path, 'classes')
+        print "Add classpath...=================> %s" % (stat_classpath)
+        # The application - add static classes the classpath
+        if os.path.exists(os.path.join(self.path, 'classes')):
+            classpath.append(os.path.normpath(os.path.join(self.path, 'classes/.')))
+
         # The modules
         for module in self.modules():
             if os.path.exists(os.path.join(module, 'lib')):
