@@ -774,13 +774,13 @@ public class Play {
             }
         }
 
-        // Auto add special modules
-        if (Play.runningInTestMode()) {
-            addModule("_testrunner", new File(Play.frameworkPath, "modules/testrunner"));
-        }
-        if (Play.mode == Mode.DEV) {
-            addModule("_docviewer", new File(Play.frameworkPath, "modules/docviewer"));
-        }
+//        // Auto add special modules
+//        if (Play.runningInTestMode()) {
+//            addModule("_testrunner", new File(Play.frameworkPath, "modules/testrunner"));
+//        }
+//        if (Play.mode == Mode.DEV) {
+//            addModule("_docviewer", new File(Play.frameworkPath, "modules/docviewer"));
+//        }
     }
 
     /**
