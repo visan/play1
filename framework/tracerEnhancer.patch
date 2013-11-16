@@ -1,0 +1,121 @@
+Index: framework/src/play/CorePlugin.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- framework/src/play/CorePlugin.java	(revision ef6b2fdda3c8c0ea277ec69200db7a8d3224a36d)
++++ framework/src/play/CorePlugin.java	(revision )
+@@ -13,13 +13,7 @@
+ import org.apache.commons.lang.StringUtils;
+ import play.Play.Mode;
+ import play.classloading.ApplicationClasses.ApplicationClass;
+-import play.classloading.enhancers.ContinuationEnhancer;
+-import play.classloading.enhancers.ControllersEnhancer;
+-import play.classloading.enhancers.Enhancer;
+-import play.classloading.enhancers.LVEnhancer;
+-import play.classloading.enhancers.MailerEnhancer;
+-import play.classloading.enhancers.PropertiesEnhancer;
+-import play.classloading.enhancers.SigEnhancer;
++import play.classloading.enhancers.*;
+ import play.exceptions.UnexpectedException;
+ import play.libs.Crypto;
+ import play.mvc.Http.Header;
+@@ -287,6 +281,7 @@
+     @Override
+     public void enhance(ApplicationClass applicationClass) throws Exception {
+         Class<?>[] enhancers = new Class[]{
++            TracerEnhancer.class,
+             SigEnhancer.class,
+             ControllersEnhancer.class,
+             
+Index: framework/src/play/classloading/enhancers/TracerEnhancer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- framework/src/play/classloading/enhancers/TracerEnhancer.java	(revision )
++++ framework/src/play/classloading/enhancers/TracerEnhancer.java	(revision )
+@@ -0,0 +1,57 @@
++package play.classloading.enhancers;
++
++import javassist.CtClass;
++import javassist.CtField;
++import javassist.CtMethod;
++import javassist.Modifier;
++import play.Logger;
++import play.classloading.ApplicationClasses.ApplicationClass;
++import play.exceptions.UnexpectedException;
++import play.mvc.Mailer;
++
++/**
++ * Enhance mailers classes.
++ */
++public class TracerEnhancer extends Enhancer {
++//    String def = "private static java.util.logging.Logger _log;";
++//    String ifLog = "if (_log.isLoggable(java.util.logging.Level.INFO))";
++
++    @Override
++    public void enhanceThisClass(ApplicationClass applicationClass) throws Exception {
++        if (isScala(applicationClass)) {
++            return;
++        }
++
++        CtClass ctClass = makeClass(applicationClass);
++//        {
++//            CtField field = CtField.make(def, ctClass);
++//            String getLogger = "java.util.logging.Logger.getLogger("+ applicationClass.getClass().getName()+ ".class.getName());";
++//            ctClass.addField(field, getLogger);
++//        }
++
++        for (final CtMethod ctMethod : ctClass.getDeclaredMethods()) {
++                if(hasAnnotation(ctMethod,"tracer.Trace")){
++//                if (a.getClass().getName().indexOf("tracer")!=-1) {
++                    ctMethod.insertBefore("log.info(\">>" + ctMethod.getName()+"\");");
++                    ctMethod.insertAfter("log.info(\"<<" + ctMethod.getName()+ "\");");
++                    System.out.println("Enhanced class: "+ctClass.getName());
++                }
++
++//            if (Modifier.isPublic(ctMethod.getModifiers()) && Modifier.isStatic(ctMethod.getModifiers())) {
++//                try {
++//                    ctMethod.insertBefore("if(infos.get() != null) {play.Logger.warn(\"You call " + ctMethod.getLongName() + " from \" + ((java.util.Map)infos.get()).get(\"method\") + \". It's forbidden in a Mailer. It will propably fail...\", new Object[0]);}; infos.set(new java.util.HashMap());((java.util.Map)infos.get()).put(\"method\", \"" + ctMethod.getLongName() + "\");");
++//                    ctMethod.insertAfter("infos.set(null);", true);
++//                } catch (Exception e) {
++//                    Logger.error(e, "Error in MailerEnhancer");
++//                    throw new UnexpectedException("Error in MailerEnhancer", e);
++//                }
++//            }
++
++        }
++
++        // Done.
++        applicationClass.enhancedByteCode = ctClass.toBytecode();
++        ctClass.defrost();
++
++    }
++}
+Index: framework/src/tracer/Trace.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- framework/src/tracer/Trace.java	(revision )
++++ framework/src/tracer/Trace.java	(revision )
+@@ -0,0 +1,18 @@
++package tracer;
++
++import java.lang.annotation.ElementType;
++import java.lang.annotation.Retention;
++import java.lang.annotation.RetentionPolicy;
++import java.lang.annotation.Target;
++
++/**
++ * Created with IntelliJ IDEA.
++ * User: adg
++ * Date: 11/14/13
++ * Time: 11:03 PM
++ * To change this template use File | Settings | File Templates.
++ */
++@Target(ElementType.METHOD)
++@Retention(RetentionPolicy.RUNTIME)
++public @interface Trace {
++}
