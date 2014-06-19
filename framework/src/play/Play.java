@@ -262,7 +262,10 @@ public class Play {
             Logger.error("Illegal mode '%s', use either prod or dev", configuration.getProperty("application.mode"));
             fatalServerErrorOccurred();
         }
-        if (usePrecompiled || forceProd) {
+        // Force the Production mode if forceProd or precompile is activate
+        // Set to the Prod mode must be done before loadModules call
+        // as some modules (e.g. DocViewver) is only available in DEV
+        if (usePrecompiled || forceProd || System.getProperty("precompile") != null) {
             mode = Mode.PROD;
         }
 
@@ -314,8 +317,7 @@ public class Play {
         pluginCollection.loadPlugins();
 
         // Done !
-        if (mode == Mode.PROD || System.getProperty("precompile") != null) {
-            mode = Mode.PROD;
+        if (mode == Mode.PROD) {
             if (preCompile() && System.getProperty("precompile") == null) {
                 start();
             } else {
@@ -736,42 +738,56 @@ public class Play {
         }
 
         // Load modules from modules/ directory, but get the order from the dependencies.yml file
-        // .listFiles() returns items in an OS dependant sequence, which is bad
-        // See #781
-        // the yaml parser wants play.version as an environment variable
-        System.setProperty("play.version", Play.version);
-        DependenciesManager dm = new DependenciesManager(applicationPath, frameworkPath, null);
+		// .listFiles() returns items in an OS dependant sequence, which is bad
+		// See #781
+		// the yaml parser wants play.version as an environment variable
+		System.setProperty("play.version", Play.version);
+		System.setProperty("application.path", applicationPath.getAbsolutePath());
 
-        File localModules = Play.getFile("modules");
-        List<String> modules = new ArrayList<String>();
-        if (localModules.exists() && localModules.isDirectory()) {
-            try {
-                modules = dm.retrieveModules();
-            } catch (Exception e) {
-                throw new UnexpectedException("There was a problem parsing " + DependenciesManager.MODULE_ORDER_CONF, e);
+		File localModules = Play.getFile("modules");
+		List<String> modules = new ArrayList<String>();
+		if (localModules != null && localModules.exists() && localModules.isDirectory()) {
+			try {
+			        File userHome  = new File(System.getProperty("user.home"));
+			        DependenciesManager dm = new DependenciesManager(applicationPath, frameworkPath, userHome);
+				modules = dm.retrieveModules();
+			} catch (Exception e) {
+				Logger.error("There was a problem parsing depencies.yml (module will not be loaded in order of the dependencies.yml)", e);
+				// Load module without considering the dependencies.yml order
+				modules = Arrays.asList(localModules.list());		
+			}
 
-            }
-            for (Iterator iter = modules.iterator(); iter.hasNext(); ) {
-                String moduleName = (String) iter.next();
+			for (Iterator<String> iter = modules.iterator(); iter.hasNext();) {
+				String moduleName = (String) iter.next();
 
-                File module = new File(localModules, moduleName);
+				File module = new File(localModules, moduleName);
 
-                if (moduleName.contains("-")) {
-                    moduleName = moduleName.substring(0, moduleName.indexOf("-"));
-                }
+				if (moduleName.contains("-")) {
+					moduleName = moduleName.substring(0, moduleName.indexOf("-"));
+				}
+				
+				if(module == null || !module.exists()){
+				        Logger.error("Module %s will not be loaded because %s does not exist", moduleName, module.getAbsolutePath());
+				} else if (module.isDirectory()) {
+					addModule(moduleName, module);
+				} else {
+					File modulePath = new File(IO.readContentAsString(module).trim());
+					if (!modulePath.exists() || !modulePath.isDirectory()) {
+						Logger.error("Module %s will not be loaded because %s does not exist", moduleName, modulePath.getAbsolutePath());
+					} else {
+						addModule(moduleName, modulePath);
+					}
+				}
+			}
+		}
 
-                if (module.isDirectory()) {
-                    addModule(moduleName, module);
-                } else {
+        // Auto add special modules
+        if (Play.runningInTestMode()) {
+            addModule("_testrunner", new File(Play.frameworkPath, "modules/testrunner"));
+        }
 
-                    File modulePath = new File(IO.readContentAsString(module).trim());
-                    if (!modulePath.exists() || !modulePath.isDirectory()) {
-                        Logger.error("Module %s will not be loaded because %s does not exist", moduleName, modulePath.getAbsolutePath());
-                    } else {
-                        addModule(moduleName, modulePath);
-                    }
-                }
-            }
+        if (Play.mode == Mode.DEV) {
+            addModule("_docviewer", new File(Play.frameworkPath, "modules/docviewer"));
         }
 
 //        // Auto add special modules
