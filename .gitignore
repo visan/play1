@@ -41,3 +41,8 @@ modules/*
 !modules/secure
 !modules/testrunner
 
+out/production/play1/play/vfs/VirtualFile.class
+out/
+documentation/
+modules/docviewer/lib/play-docviewer.jar
+framework/build.log
