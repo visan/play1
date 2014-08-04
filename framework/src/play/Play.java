@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.LineNumberReader;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -13,8 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import play.cache.Cache;
-import play.classloading.ApplicationClasses;
-import play.classloading.ApplicationClassloader;
+import play.classloading.*;
 import play.deps.DependenciesManager;
 import play.exceptions.PlayException;
 import play.exceptions.UnexpectedException;
@@ -215,7 +216,21 @@ public class Play {
         // Read the configuration file
         readConfiguration();
 
-        Play.classes = new ApplicationClasses();
+      final ApplicationClassesCompilerWorkspace compilerWorkspace = new ApplicationClassesCompilerWorkspace();
+      ApplicationCompiler applicationCompiler=new EclipseJdtApplicationCompiler(compilerWorkspace);
+
+      if(!configuration.getProperty("application.compiler.class").isEmpty()){
+          try {
+            Class aClass=Class.forName(configuration.getProperty("application.compiler.class"));
+            Constructor constructor=aClass.getConstructor(CompilerWorkspace.class, Properties.class);
+            applicationCompiler=(ApplicationCompiler)constructor.newInstance(compilerWorkspace, configuration);
+          } catch (Exception e) {
+            Logger.error(e,"Cannot instantiate application.compiler.class: {}",configuration.getProperty("application.compiler.class"));
+          }
+      }
+
+        Play.classes = new ApplicationClasses(applicationCompiler);
+      compilerWorkspace.setClasses(Play.classes);
 
         // Configure logs
         Logger.init();
@@ -763,7 +778,7 @@ public class Play {
 			} catch (Exception e) {
 				Logger.error("There was a problem parsing depencies.yml (module will not be loaded in order of the dependencies.yml)", e);
 				// Load module without considering the dependencies.yml order
-				modules.addAll(Arrays.asList(localModules.list()));		
+				modules.addAll(Arrays.asList(localModules.list()));
 			}
 
 			for (Iterator<String> iter = modules.iterator(); iter.hasNext();) {
@@ -774,7 +789,7 @@ public class Play {
 				if (moduleName.contains("-")) {
 					moduleName = moduleName.substring(0, moduleName.indexOf("-"));
 				}
-				
+
 				if(module == null || !module.exists()){
 				        Logger.error("Module %s will not be loaded because %s does not exist", moduleName, module.getAbsolutePath());
 				} else if (module.isDirectory()) {
@@ -819,7 +834,7 @@ public class Play {
     public static void addModule(String name, File path) {
         addModule(VirtualFile.open(applicationPath), name, path);
     }
-    
+
     /**
      * Add a play application (as plugin)
      *
