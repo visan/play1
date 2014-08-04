@@ -22,17 +22,25 @@ import play.vfs.VirtualFile;
  * Application classes container.
  */
 public class ApplicationClasses {
-
-    /**
+  /**
      * Reference to the eclipse compiler.
      */
-    ApplicationCompiler compiler = new ApplicationCompiler(this);
+    final ApplicationCompiler compiler;
     /**
      * Cache of all compiled classes
      */
     Map<String, ApplicationClass> classes = new HashMap<String, ApplicationClass>();
 
-    /**
+  public ApplicationClasses(ApplicationCompiler compiler) {
+    this.compiler = compiler;
+  }
+
+  public ApplicationClasses() {
+    compiler = new EclipseJdtApplicationCompiler(new ApplicationClassesCompilerWorkspace(this));
+  }
+
+
+  /**
      * Clear the classes cache
      */
     public void clear() {
