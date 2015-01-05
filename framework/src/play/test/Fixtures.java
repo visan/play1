@@ -6,12 +6,10 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.yaml.snakeyaml.scanner.ScannerException;
-
 import play.Logger;
 import play.Play;
 import play.classloading.ApplicationClasses;
 import play.data.binding.As;
-import play.data.binding.NoBinding;
 import play.data.binding.Binder;
 import play.data.binding.ParamNode;
 import play.data.binding.RootParamNode;
@@ -19,8 +17,8 @@ import play.data.binding.types.DateBinder;
 import play.db.DB;
 import play.db.DBConfig;
 import play.db.DBPlugin;
-import play.db.SQLSplitter;
 import play.db.Model;
+import play.db.SQLSplitter;
 import play.db.jpa.JPAPlugin;
 import play.exceptions.DatabaseException;
 import play.exceptions.UnexpectedException;
@@ -29,6 +27,7 @@ import play.libs.IO;
 import play.templates.TemplateLoader;
 import play.vfs.VirtualFile;
 
+import javax.persistence.Entity;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,9 +41,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-import javax.persistence.Entity;
 
 @As(Fixtures.PROFILE_NAME)
 public class Fixtures {
@@ -99,7 +95,7 @@ public class Fixtures {
 
     /**
      * Delete all Model instances for the given types using the underlying persistence mechanisms
-     * @param types Types to delete
+     * @param classes Types to delete
      */
     public static void delete(List<Class<? extends Model>> classes) {
         @SuppressWarnings("unchecked")
@@ -129,7 +125,7 @@ public class Fixtures {
 
     /**
      * Use deleteDatabase() instead
-     * @deprecated use {@link deleteDatabase()} instead
+     * @deprecated use {@link #deleteDatabase()} instead
      */
     @Deprecated
     public static void deleteAll() {
@@ -183,7 +179,7 @@ public class Fixtures {
 
     /**
      * @param name
-     * @deprecated use {@link loadModels(String...)} instead
+     * @deprecated use {@link #loadModels(String...)} instead
      */
     @Deprecated
     public static void load(String name) {
@@ -308,7 +304,7 @@ public class Fixtures {
     }
 
     /**
-     * @deprecated use {@link loadModels(String...)} instead
+     * @deprecated use {@link #loadModels(String...)} instead
      */
     @Deprecated
     public static void load(String... names) {
@@ -316,14 +312,14 @@ public class Fixtures {
     }
 
     /**
-     * @see loadModels(String name)
+     * @see #loadModels(String name)
      */
     public static void loadModels(String... names) {
         loadModels(true, names);
     }
     
     /**
-     * @see loadModels(String name)
+     * @see #loadModels(boolean loadAsTemplate, String name)
      */
     public static void loadModels(boolean loadAsTemplate, String... names) {
         Map<String, Object> idCache = new HashMap<String, Object>();
@@ -333,21 +329,21 @@ public class Fixtures {
     }
 
     /**
-     * @deprecated use {@link loadModels(String...)} instead
+     * @deprecated use {@link #loadModels(String...)} instead
      */
     public static void load(List<String> names) {
         loadModels(names);
     }
 
     /**
-     * @see loadModels(String name)
+     * @see #loadModels(String name)
      */
     public static void loadModels(List<String> names) {
         loadModels(true, names);
     }
     
     /**
-     * @see loadModels(String name)
+     * @see #loadModels(boolean, String...)
      */
     public static void loadModels(boolean loadAsTemplate, List<String> names) {
         String[] tNames = new String[names.size()];
@@ -601,8 +597,6 @@ public class Fixtures {
         }
         
         if (dbConfig.getUrl().startsWith("jdbc:sqlserver:")) {
-            Statement exec=null;
-
             try {
                 List<String> names = new ArrayList<String>();
                 Connection connection=dbConfig.getConnection();
@@ -614,11 +608,15 @@ public class Fixtures {
                 }
 
                     // Then we disable all foreign keys
-                exec=connection.createStatement();
-                for (String tableName:names)
-                    exec.addBatch("ALTER TABLE " + tableName+" NOCHECK CONSTRAINT ALL");
-                exec.executeBatch();
-                exec.close();
+                Statement exec = connection.createStatement();
+                try {
+                    for (String tableName : names)
+                        exec.addBatch("ALTER TABLE " + tableName + " NOCHECK CONSTRAINT ALL");
+                    exec.executeBatch();
+                }
+                finally {
+                    exec.close();
+                }
 
                 return;
             } catch (SQLException ex) {

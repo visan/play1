@@ -1,21 +1,6 @@
 package play.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.FutureTask;
-
+import java.util.Comparator;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.bytecode.SourceFileAttribute;
@@ -30,7 +15,18 @@ import play.mvc.After;
 import play.mvc.Before;
 import play.mvc.Finally;
 import play.mvc.With;
+
+import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.concurrent.FutureTask;
+
 import static java.util.Collections.addAll;
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static java.util.Collections.sort;
 
 /**
  * Java utils
@@ -292,7 +288,6 @@ public class Java {
      * @return A list of method object
      */
     public static List<Method> findAllAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotationType) {
-
         return getJavaWithCaching().findAllAnnotatedMethods(clazz, annotationType);
     }
 
@@ -352,11 +347,14 @@ public class Java {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         try {
             ObjectInputStream oi = new ObjectInputStream(bais);
-            return oi.readObject();
-        } finally {
-            if (bais != null) {
-                bais.close();
+            try {
+                return oi.readObject();
             }
+            finally {
+                closeQuietly(oi);
+            }
+        } finally {
+            closeQuietly(bais);
         }
     }
 
@@ -367,7 +365,7 @@ public class Java {
      */
     public static class FieldWrapper {
 
-        final static int unwritableModifiers = Modifier.FINAL | Modifier.NATIVE | Modifier.STATIC;
+        static final int unwritableModifiers = Modifier.FINAL | Modifier.NATIVE | Modifier.STATIC;
         private Method setter;
         private Method getter;
         private Field field;
@@ -505,7 +503,7 @@ class JavaWithCaching {
      * @param annotationType The annotation class
      * @return A list of method object
      */
-    public List<Method> findAllAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotationType) {
+    public List<Method> findAllAnnotatedMethods(Class<?> clazz, final Class<? extends Annotation> annotationType) {
 
         if( clazz == null ) {
             return new ArrayList<Method>(0);
@@ -524,6 +522,7 @@ class JavaWithCaching {
             }
             // have to resolve it.
             methods = new ArrayList<Method>();
+
             // get list of all annotated methods on this class..
             for( Method method : findAllAnnotatedMethods( clazz)) {
                 if (method.isAnnotationPresent(annotationType)) {
@@ -531,10 +530,34 @@ class JavaWithCaching {
                 }
             }
 
+            sortByPriority(methods, annotationType);
+
             // store it in cache
             classAndAnnotation2Methods.put( key, methods);
 
             return methods;
+        }
+    }
+
+    private void sortByPriority(List<Method> methods, final Class<? extends Annotation> annotationType) {
+        try {
+            final Method priority = annotationType.getMethod("priority");
+            sort(methods, new Comparator<Method>() {
+                @Override public int compare(Method m1, Method m2) {
+                    try {
+                        Integer priority1 = (Integer) priority.invoke(m1.getAnnotation(annotationType));
+                        Integer priority2 = (Integer) priority.invoke(m2.getAnnotation(annotationType));
+                        return priority1.compareTo(priority2);
+                    }
+                    catch (Exception e) {
+                        // should not happen
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+        catch (NoSuchMethodException e) {
+            // no need to sort - this annotation doesn't have priority() method
         }
     }
 

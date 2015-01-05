@@ -244,13 +244,12 @@ def isTestFrameworkId( framework_id ):
 def getJavaVersion():
     sp = subprocess.Popen(["java", "-version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     javaVersion = sp.communicate()
-    javaVersion =  str( javaVersion)
+    javaVersion = str(javaVersion)
     
-    if re.compile('1.5').search(javaVersion) is not None:
-        return "1.5"  
-    elif re.compile('1.6').search(javaVersion) is not None:
-        return "1.6" 
-    elif re.compile('1.7').search(javaVersion) is not None:
-        return "1.7" 
+    result = re.search('version "([a-zA-Z0-9\.\-_]{1,})"', javaVersion)
+    
+    if result:
+        return result.group(1)
     else:
-        return "1.8"
+        print "Unable to retrieve java version from " + javaVersion
+        return ""

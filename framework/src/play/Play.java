@@ -911,5 +911,8 @@ public class Play {
         }
     }
 
+    public static boolean useDefaultMockMailSystem() {
+        return configuration.getProperty("mail.smtp", "").equals("mock") && mode == Mode.DEV;
+    }
 
 }
