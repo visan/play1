@@ -219,7 +219,8 @@ public class Play {
       final ApplicationClassesCompilerWorkspace compilerWorkspace = new ApplicationClassesCompilerWorkspace();
       ApplicationCompiler applicationCompiler=new EclipseJdtApplicationCompiler(compilerWorkspace);
 
-      if(!configuration.getProperty("application.compiler.class").isEmpty()){
+      if(null!=configuration.getProperty("application.compiler.class")
+              &&!configuration.getProperty("application.compiler.class").isEmpty()){
           try {
             Class aClass=Class.forName(configuration.getProperty("application.compiler.class"));
             Constructor constructor=aClass.getConstructor(CompilerWorkspace.class, Properties.class);
@@ -805,14 +806,14 @@ public class Play {
 			}
 		}
 
-        // Auto add special modules
-        if (Play.runningInTestMode()) {
-            addModule(appRoot, "_testrunner", new File(Play.frameworkPath, "modules/testrunner"));
-        }
-
-        if (Play.mode == Mode.DEV) {
-            addModule(appRoot, "_docviewer", new File(Play.frameworkPath, "modules/docviewer"));
-        }
+//        // Auto add special modules
+//        if (Play.runningInTestMode()) {
+//            addModule(appRoot, "_testrunner", new File(Play.frameworkPath, "modules/testrunner"));
+//        }
+//
+//        if (Play.mode == Mode.DEV) {
+//            addModule(appRoot, "_docviewer", new File(Play.frameworkPath, "modules/docviewer"));
+//        }
 
 //        // Auto add special modules
 //        if (Play.runningInTestMode()) {

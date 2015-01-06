@@ -75,9 +75,9 @@ class PlayApplication(object):
         application_mode = self.readConf('application.mode').lower()
         if not application_mode:
             application_mode = "dev"
-        if application_mode == 'dev':
-            #Load docviewer module
-			modules.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'modules/docviewer')))
+        # if application_mode == 'dev':
+        #     #Load docviewer module
+			# modules.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'modules/docviewer')))
 			
         for m in self.readConfs('module.'):
             if '${play.path}' in m:
@@ -102,8 +102,8 @@ class PlayApplication(object):
                     modules.append(mf)
                 else:
                     modules.append(open(mf, 'r').read().strip())
-        if isTestFrameworkId( self.play_env["id"] ):
-            modules.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'modules/testrunner')))
+        # if isTestFrameworkId( self.play_env["id"] ):
+        #     modules.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'modules/testrunner')))
         return set(modules) # Ensure we don't have duplicates
 
     def module_names(self):
@@ -159,7 +159,7 @@ class PlayApplication(object):
             self.find_and_add_all_jars(classpath, os.path.join(self.path, 'lib'))
 
         stat_classpath=os.path.join(self.path, 'classes')
-        print "Add classpath...=================> %s" % (stat_classpath)
+        print "Add app static classpath...: %s" % (stat_classpath)
         # The application - add static classes the classpath
         if os.path.exists(os.path.join(self.path, 'classes')):
             classpath.append(os.path.normpath(os.path.join(self.path, 'classes/.')))
@@ -172,6 +172,11 @@ class PlayApplication(object):
                     for jar in os.listdir(libs):
                         if jar.endswith('.jar'):
                             classpath.append(os.path.normpath(os.path.join(libs, '%s' % jar)))
+            module_stat_classpath=os.path.join(module, 'classes')
+            print "Add module static classpath...: %s" % (module_stat_classpath)
+            # The application - add static classes the classpath
+            if os.path.exists(os.path.join(module, 'classes')):
+                classpath.append(os.path.normpath(os.path.join(module, 'classes/.')))
 
         # The framework
         for jar in os.listdir(os.path.join(self.play_env["basedir"], 'framework/lib')):
