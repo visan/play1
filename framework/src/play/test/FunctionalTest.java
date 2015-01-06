@@ -497,7 +497,7 @@ public abstract class FunctionalTest extends BaseTest {
     protected static URL reverse() {
         ControllerInstrumentation.stopActionCall();
         ActionDefinition actionDefinition = new ActionDefinition();
-        Controller._currentReverse.set(actionDefinition);
+//        Controller._currentReverse.set(actionDefinition);
         return new URL(actionDefinition);
     }
 

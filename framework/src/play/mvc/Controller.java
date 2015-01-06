@@ -21,40 +21,14 @@ import play.classloading.ApplicationClasses.ApplicationClass;
 import play.classloading.enhancers.ContinuationEnhancer;
 import play.classloading.enhancers.ControllersEnhancer.ControllerInstrumentation;
 import play.classloading.enhancers.ControllersEnhancer.ControllerSupport;
-import play.classloading.enhancers.LVEnhancer;
-import play.classloading.enhancers.LVEnhancer.LVEnhancerRuntime;
-import play.classloading.enhancers.LVEnhancer.MethodExecution;
-import play.data.binding.Unbinder;
-import play.data.validation.Validation;
-import play.data.validation.ValidationPlugin;
 import play.exceptions.*;
 import play.libs.Time;
 import play.mvc.Http.Request;
-import play.mvc.Router.ActionDefinition;
-import play.mvc.results.BadRequest;
-import play.mvc.results.Error;
-import play.mvc.results.Forbidden;
-import play.mvc.results.NotFound;
-import play.mvc.results.NotModified;
-import play.mvc.results.Ok;
-import play.mvc.results.Redirect;
-import play.mvc.results.RedirectToStatic;
-import play.mvc.results.RenderBinary;
-import play.mvc.results.RenderHtml;
-import play.mvc.results.RenderJson;
-import play.mvc.results.RenderTemplate;
-import play.mvc.results.RenderText;
-import play.mvc.results.RenderXml;
 import play.mvc.results.Result;
-import play.mvc.results.Unauthorized;
-import play.templates.Template;
-import play.templates.TemplateLoader;
 import play.utils.Default;
 import play.utils.Java;
 import play.vfs.VirtualFile;
 
-import com.google.gson.JsonSerializer;
-import com.thoughtworks.xstream.XStream;
 import java.lang.reflect.Type;
 import org.apache.commons.javaflow.Continuation;
 import org.apache.commons.javaflow.bytecode.StackRecorder;
@@ -149,56 +123,56 @@ public class Controller implements ControllerSupport {
      * Note: The ControllersEnhancer makes sure that an appropriate thread local version is applied.
      * ie : controller.validation - controller.validation.current()
      */
-    protected static Validation validation = null;
+//    protected static Validation validation = null;
 
     /**
      * Return a 200 OK text/plain response
      * @param text The response content
      */
-    protected static void renderText(Object text) {
-        throw new RenderText(text == null ? "" : text.toString());
-    }
+//    protected static void renderText(Object text) {
+//        throw new RenderText(text == null ? "" : text.toString());
+//    }
 
     /**
      * Return a 200 OK text/html response
      * @param html The response content
      */
-    protected static void renderHtml(Object html) {
-        throw new RenderHtml(html == null ? "" : html.toString());
-    }
+//    protected static void renderHtml(Object html) {
+//        throw new RenderHtml(html == null ? "" : html.toString());
+//    }
 
     /**
      * Return a 200 OK text/plain response
      * @param pattern The response content to be formatted (with String.format)
      * @param args Args for String.format
      */
-    protected static void renderText(CharSequence pattern, Object... args) {
-        throw new RenderText(pattern == null ? "" : String.format(pattern.toString(), args));
-    }
+//    protected static void renderText(CharSequence pattern, Object... args) {
+//        throw new RenderText(pattern == null ? "" : String.format(pattern.toString(), args));
+//    }
 
     /**
      * Return a 200 OK text/xml response
      * @param xml The XML string
      */
-    protected static void renderXml(String xml) {
-        throw new RenderXml(xml);
-    }
+//    protected static void renderXml(String xml) {
+//        throw new RenderXml(xml);
+//    }
 
     /**
      * Return a 200 OK text/xml response
      * @param xml The DOM document object
      */
-    protected static void renderXml(Document xml) {
-        throw new RenderXml(xml);
-    }
+//    protected static void renderXml(Document xml) {
+//        throw new RenderXml(xml);
+//    }
 
     /**
      * Return a 200 OK text/xml response. Use renderXml(Object, XStream) to customize the result.
      * @param o the object to serialize
      */
-    protected static void renderXml(Object o) {
-        throw new RenderXml(o);
-    }
+//    protected static void renderXml(Object o) {
+//        throw new RenderXml(o);
+//    }
 
     /**
      * Return a 200 OK text/xml response
@@ -206,18 +180,18 @@ public class Controller implements ControllerSupport {
      * @param xstream the XStream object to use for serialization. See XStream's documentation
      *      for details about customizing the output.
      */
-    protected static void renderXml(Object o, XStream xstream) {
-        throw new RenderXml(o, xstream);
-    }
+//    protected static void renderXml(Object o, XStream xstream) {
+//        throw new RenderXml(o, xstream);
+//    }
 
     /**
      * Return a 200 OK application/binary response.
      * Content is fully loaded in memory, so it should not be used with large data.
      * @param is The stream to copy
      */
-    protected static void renderBinary(InputStream is) {
-        throw new RenderBinary(is, null, true);
-    }
+//    protected static void renderBinary(InputStream is) {
+//        throw new RenderBinary(is, null, true);
+//    }
 
     /**
      * Return a 200 OK application/binary response. Content is streamed.
@@ -225,9 +199,9 @@ public class Controller implements ControllerSupport {
      * @param is The stream to copy
      * @param length Stream's size in bytes.
      */
-    protected static void renderBinary(InputStream is, long length) {
-        throw new RenderBinary(is, null, length, true);
-    }
+//    protected static void renderBinary(InputStream is, long length) {
+//        throw new RenderBinary(is, null, length, true);
+//    }
 
     /**
      * Return a 200 OK application/binary response with content-disposition attachment.
@@ -236,9 +210,9 @@ public class Controller implements ControllerSupport {
      * @param is The stream to copy
      * @param name Name of file user is downloading.
      */
-    protected static void renderBinary(InputStream is, String name) {
-        throw new RenderBinary(is, name, false);
-    }
+//    protected static void renderBinary(InputStream is, String name) {
+//        throw new RenderBinary(is, name, false);
+//    }
 
     /**
      * Return a 200 OK application/binary response with content-disposition attachment.
@@ -247,9 +221,9 @@ public class Controller implements ControllerSupport {
      * @param name Name of file user is downloading.
      * @param length Stream's size in bytes.
      */
-    protected static void renderBinary(InputStream is, String name, long length) {
-        throw new RenderBinary(is, name, length, false);
-    }
+//    protected static void renderBinary(InputStream is, String name, long length) {
+//        throw new RenderBinary(is, name, length, false);
+//    }
 
     /**
      * Return a 200 OK application/binary response with content-disposition attachment.
@@ -259,9 +233,9 @@ public class Controller implements ControllerSupport {
      * @param name Name of file user is downloading.
      * @param inline true to set the response Content-Disposition to inline
      */
-    protected static void renderBinary(InputStream is, String name, boolean inline) {
-        throw new RenderBinary(is, name, inline);
-    }
+//    protected static void renderBinary(InputStream is, String name, boolean inline) {
+//        throw new RenderBinary(is, name, inline);
+//    }
 
     /**
      * Return a 200 OK application/binary response with content-disposition attachment.
@@ -271,9 +245,9 @@ public class Controller implements ControllerSupport {
      * @param length Stream's size in bytes.
      * @param inline true to set the response Content-Disposition to inline
      */
-    protected static void renderBinary(InputStream is, String name, long length, boolean inline) {
-        throw new RenderBinary(is, name, length, inline);
-    }
+//    protected static void renderBinary(InputStream is, String name, long length, boolean inline) {
+//        throw new RenderBinary(is, name, length, inline);
+//    }
 
     /**
      * Return a 200 OK application/binary response with content-disposition attachment.
@@ -284,9 +258,9 @@ public class Controller implements ControllerSupport {
      * @param contentType The content type of the attachment
      * @param inline true to set the response Content-Disposition to inline
      */
-    protected static void renderBinary(InputStream is, String name, String contentType, boolean inline) {
-        throw new RenderBinary(is, name, contentType, inline);
-    }
+//    protected static void renderBinary(InputStream is, String name, String contentType, boolean inline) {
+//        throw new RenderBinary(is, name, contentType, inline);
+//    }
 
     /**
      * Return a 200 OK application/binary response with content-disposition attachment.
@@ -297,453 +271,453 @@ public class Controller implements ControllerSupport {
      * @param contentType The content type of the attachment
      * @param inline true to set the response Content-Disposition to inline
      */
-    protected static void renderBinary(InputStream is, String name, long length, String contentType, boolean inline) {
-        throw new RenderBinary(is, name, length, contentType, inline);
-    }
+//    protected static void renderBinary(InputStream is, String name, long length, String contentType, boolean inline) {
+//        throw new RenderBinary(is, name, length, contentType, inline);
+//    }
+//
+//    /**
+//     * Return a 200 OK application/binary response
+//     * @param file The file to copy
+//     */
+//    protected static void renderBinary(File file) {
+//        throw new RenderBinary(file);
+//    }
+//
+//    /**
+//     * Return a 200 OK application/binary response with content-disposition attachment
+//     * @param file The file to copy
+//     * @param name The attachment name
+//     */
+//    protected static void renderBinary(File file, String name) {
+//        throw new RenderBinary(file, name);
+//    }
+//
+//    /**
+//     * Render a 200 OK application/json response
+//     * @param jsonString The JSON string
+//     */
+//    protected static void renderJSON(String jsonString) {
+//        throw new RenderJson(jsonString);
+//    }
+//
+//    /**
+//     * Render a 200 OK application/json response
+//     * @param o The Java object to serialize
+//     */
+//    protected static void renderJSON(Object o) {
+//        throw new RenderJson(o);
+//    }
+//
+//    /**
+//     * Render a 200 OK application/json response
+//     * @param o The Java object to serialize
+//     * @param type The Type informations for complex generic types
+//     */
+//    protected static void renderJSON(Object o, Type type) {
+//        throw new RenderJson(o, type);
+//    }
+//
+//    /**
+//     * Render a 200 OK application/json response.
+//     * @param o The Java object to serialize
+//     * @param adapters A set of GSON serializers/deserializers/instance creator to use
+//     */
+//    protected static void renderJSON(Object o, JsonSerializer<?>... adapters) {
+//        throw new RenderJson(o, adapters);
+//    }
+//
+//    /**
+//     * Send a 304 Not Modified response
+//     */
+//    protected static void notModified() {
+//        throw new NotModified();
+//    }
+//
+//    /**
+//     * Send a 400 Bad request
+//     */
+//    protected static void badRequest(String msg) {
+//        throw new BadRequest(msg);
+//    }
+//
+//    /**
+//     * Send a 400 Bad request
+//     */
+//    protected static void badRequest() {
+//        throw new BadRequest();
+//    }
+//
+//    /**
+//     * Send a 401 Unauthorized response
+//     * @param realm The realm name
+//     */
+//    protected static void unauthorized(String realm) {
+//        throw new Unauthorized(realm);
+//    }
+//
+//    /**
+//     * Send a 401 Unauthorized response
+//     */
+//    protected static void unauthorized() {
+//        throw new Unauthorized("Unauthorized");
+//    }
+//
+//    /**
+//     * Send a 404 Not Found response
+//     * @param what The Not Found resource name
+//     */
+//    protected static void notFound(String what) {
+//        throw new NotFound(what);
+//    }
+//
+//    /**
+//     * Send a 200 OK response
+//     */
+//    protected static void ok() {
+//        throw new Ok();
+//    }
 
-    /**
-     * Return a 200 OK application/binary response
-     * @param file The file to copy
-     */
-    protected static void renderBinary(File file) {
-        throw new RenderBinary(file);
-    }
+//    /**
+//     * Send a todo response
+//     */
+//    protected static void todo() {
+//        notFound("This action has not been implemented Yet (" + request.action + ")");
+//    }
 
-    /**
-     * Return a 200 OK application/binary response with content-disposition attachment
-     * @param file The file to copy
-     * @param name The attachment name
-     */
-    protected static void renderBinary(File file, String name) {
-        throw new RenderBinary(file, name);
-    }
+//    /**
+//     * Send a 404 Not Found response if object is null
+//     * @param o The object to check
+//     */
+//    protected static void notFoundIfNull(Object o) {
+//        if (o == null) {
+//            notFound();
+//        }
+//    }
+//
+//    /**
+//     * Send a 404 Not Found response if object is null
+//     * @param o The object to check
+//     * @param what The Not Found resource name
+//     */
+//    protected static void notFoundIfNull(Object o, String what) {
+//        if (o == null) {
+//            notFound(what);
+//        }
+//    }
+//
+////    /**
+////     * Send a 404 Not Found reponse
+////     */
+////    protected static void notFound() {
+////        throw new NotFound("");
+////    }
+//
+//    /**
+//     * Check that the token submitted from a form is valid.
+//     *
+//     * @see play.templates.FastTags#_authenticityToken
+//     */
+//    protected static void checkAuthenticity() {
+//        if(Scope.Params.current().get("authenticityToken") == null || !Scope.Params.current().get("authenticityToken").equals(Scope.Session.current().getAuthenticityToken())) {
+//            forbidden("Bad authenticity token");
+//        }
+//    }
 
-    /**
-     * Render a 200 OK application/json response
-     * @param jsonString The JSON string
-     */
-    protected static void renderJSON(String jsonString) {
-        throw new RenderJson(jsonString);
-    }
+//    /**
+//     * Send a 403 Forbidden response
+//     * @param reason The reason
+//     */
+//    protected static void forbidden(String reason) {
+//        throw new Forbidden(reason);
+//    }
+//
+//    /**
+//     * Send a 403 Forbidden response
+//     */
+//    protected static void forbidden() {
+//        throw new Forbidden("Access denied");
+//    }
 
-    /**
-     * Render a 200 OK application/json response
-     * @param o The Java object to serialize
-     */
-    protected static void renderJSON(Object o) {
-        throw new RenderJson(o);
-    }
+//    /**
+//     * Send a 5xx Error response
+//     * @param status The exact status code
+//     * @param reason The reason
+//     */
+//    protected static void error(int status, String reason) {
+//        throw new Error(status, reason);
+//    }
+//
+//    /**
+//     * Send a 500 Error response
+//     * @param reason The reason
+//     */
+//    protected static void error(String reason) {
+//        throw new Error(reason);
+//    }
+//
+//    /**
+//     * Send a 500 Error response
+//     * @param reason The reason
+//     */
+//    protected static void error(Exception reason) {
+//        Logger.error(reason, "error()");
+//        throw new Error(reason.toString());
+//    }
+//
+//    /**
+//     * Send a 500 Error response
+//     */
+//    protected static void error() {
+//        throw new Error("Internal Error");
+//    }
+//
+//    /**
+//     * Add a value to the flash scope
+//     * @param key The key
+//     * @param value The value
+//     */
+//    protected static void flash(String key, Object value) {
+//        Scope.Flash.current().put(key, value);
+//    }
+//
+//    /**
+//     * Send a 302 redirect response.
+//     * @param url The Location to redirect
+//     */
+//    protected static void redirect(String url) {
+//        redirect(url, false);
+//    }
 
-    /**
-     * Render a 200 OK application/json response
-     * @param o The Java object to serialize
-     * @param type The Type informations for complex generic types
-     */
-    protected static void renderJSON(Object o, Type type) {
-        throw new RenderJson(o, type);
-    }
+//    /**
+//     * Send a 302 redirect response.
+//     * @param file The Location to redirect
+//     */
+//    protected static void redirectToStatic(String file) {
+//        try {
+//            VirtualFile vf = Play.getVirtualFile(file);
+//            if (vf == null || !vf.exists()) {
+//                throw new NoRouteFoundException(file);
+//            }
+//            throw new RedirectToStatic(Router.reverse(Play.getVirtualFile(file)));
+//        } catch (NoRouteFoundException e) {
+//            StackTraceElement element = PlayException.getInterestingStackTraceElement(e);
+//            if (element != null) {
+//                throw new NoRouteFoundException(file, Play.classes.getApplicationClass(element.getClassName()), element.getLineNumber());
+//            } else {
+//                throw e;
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Send a Redirect response.
+//     * @param url The Location to redirect
+//     * @param permanent true -> 301, false -> 302
+//     */
+//    protected static void redirect(String url, boolean permanent) {
+//        if (url.indexOf("/") == -1) { // fix Java !
+//            redirect(url, permanent, new Object[0]);
+//        }
+//        throw new Redirect(url, permanent);
+//    }
 
-    /**
-     * Render a 200 OK application/json response.
-     * @param o The Java object to serialize
-     * @param adapters A set of GSON serializers/deserializers/instance creator to use
-     */
-    protected static void renderJSON(Object o, JsonSerializer<?>... adapters) {
-        throw new RenderJson(o, adapters);
-    }
-
-    /**
-     * Send a 304 Not Modified response
-     */
-    protected static void notModified() {
-        throw new NotModified();
-    }
-
-    /**
-     * Send a 400 Bad request
-     */
-    protected static void badRequest(String msg) {
-        throw new BadRequest(msg);
-    }
-
-    /**
-     * Send a 400 Bad request
-     */
-    protected static void badRequest() {
-        throw new BadRequest();
-    }
-
-    /**
-     * Send a 401 Unauthorized response
-     * @param realm The realm name
-     */
-    protected static void unauthorized(String realm) {
-        throw new Unauthorized(realm);
-    }
-
-    /**
-     * Send a 401 Unauthorized response
-     */
-    protected static void unauthorized() {
-        throw new Unauthorized("Unauthorized");
-    }
-
-    /**
-     * Send a 404 Not Found response
-     * @param what The Not Found resource name
-     */
-    protected static void notFound(String what) {
-        throw new NotFound(what);
-    }
-
-    /**
-     * Send a 200 OK response
-     */
-    protected static void ok() {
-        throw new Ok();
-    }
-
-    /**
-     * Send a todo response
-     */
-    protected static void todo() {
-        notFound("This action has not been implemented Yet (" + request.action + ")");
-    }
-
-    /**
-     * Send a 404 Not Found response if object is null
-     * @param o The object to check
-     */
-    protected static void notFoundIfNull(Object o) {
-        if (o == null) {
-            notFound();
-        }
-    }
-
-    /**
-     * Send a 404 Not Found response if object is null
-     * @param o The object to check
-     * @param what The Not Found resource name
-     */
-    protected static void notFoundIfNull(Object o, String what) {
-        if (o == null) {
-            notFound(what);
-        }
-    }
-
-    /**
-     * Send a 404 Not Found reponse
-     */
-    protected static void notFound() {
-        throw new NotFound("");
-    }
-
-    /**
-     * Check that the token submitted from a form is valid.
-     *
-     * @see play.templates.FastTags#_authenticityToken
-     */
-    protected static void checkAuthenticity() {
-        if(Scope.Params.current().get("authenticityToken") == null || !Scope.Params.current().get("authenticityToken").equals(Scope.Session.current().getAuthenticityToken())) {
-            forbidden("Bad authenticity token");
-        }
-    }
-
-    /**
-     * Send a 403 Forbidden response
-     * @param reason The reason
-     */
-    protected static void forbidden(String reason) {
-        throw new Forbidden(reason);
-    }
-
-    /**
-     * Send a 403 Forbidden response
-     */
-    protected static void forbidden() {
-        throw new Forbidden("Access denied");
-    }
-
-    /**
-     * Send a 5xx Error response
-     * @param status The exact status code
-     * @param reason The reason
-     */
-    protected static void error(int status, String reason) {
-        throw new Error(status, reason);
-    }
-
-    /**
-     * Send a 500 Error response
-     * @param reason The reason
-     */
-    protected static void error(String reason) {
-        throw new Error(reason);
-    }
-
-    /**
-     * Send a 500 Error response
-     * @param reason The reason
-     */
-    protected static void error(Exception reason) {
-        Logger.error(reason, "error()");
-        throw new Error(reason.toString());
-    }
-
-    /**
-     * Send a 500 Error response
-     */
-    protected static void error() {
-        throw new Error("Internal Error");
-    }
-
-    /**
-     * Add a value to the flash scope
-     * @param key The key
-     * @param value The value
-     */
-    protected static void flash(String key, Object value) {
-        Scope.Flash.current().put(key, value);
-    }
-
-    /**
-     * Send a 302 redirect response.
-     * @param url The Location to redirect
-     */
-    protected static void redirect(String url) {
-        redirect(url, false);
-    }
-
-    /**
-     * Send a 302 redirect response.
-     * @param file The Location to redirect
-     */
-    protected static void redirectToStatic(String file) {
-        try {
-            VirtualFile vf = Play.getVirtualFile(file);
-            if (vf == null || !vf.exists()) {
-                throw new NoRouteFoundException(file);
-            }
-            throw new RedirectToStatic(Router.reverse(Play.getVirtualFile(file)));
-        } catch (NoRouteFoundException e) {
-            StackTraceElement element = PlayException.getInterestingStackTraceElement(e);
-            if (element != null) {
-                throw new NoRouteFoundException(file, Play.classes.getApplicationClass(element.getClassName()), element.getLineNumber());
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * Send a Redirect response.
-     * @param url The Location to redirect
-     * @param permanent true -> 301, false -> 302
-     */
-    protected static void redirect(String url, boolean permanent) {
-        if (url.indexOf("/") == -1) { // fix Java !
-            redirect(url, permanent, new Object[0]);
-        }
-        throw new Redirect(url, permanent);
-    }
-
-    /**
-     * 302 Redirect to another action
-     * @param action The fully qualified action name (ex: Application.index)
-     * @param args Method arguments
-     */
-    public static void redirect(String action, Object... args) {
-        redirect(action, false, args);
-    }
-
-    /**
-     * Redirect to another action
-     * @param action The fully qualified action name (ex: Application.index)
-     * @param permanent true -> 301, false -> 302
-     * @param args Method arguments
-     */
-    protected static void redirect(String action, boolean permanent, Object... args) {
-        try {
-            Map<String, Object> newArgs = new HashMap<String, Object>(args.length);
-            Method actionMethod = (Method) ActionInvoker.getActionMethod(action)[1];
-            String[] names = (String[]) actionMethod.getDeclaringClass().getDeclaredField("$" + actionMethod.getName() + LVEnhancer.computeMethodHash(actionMethod.getParameterTypes())).get(null);
-            for (int i = 0; i < names.length && i < args.length; i++) {
-                Annotation[] annotations = actionMethod.getParameterAnnotations()[i];
-                boolean isDefault = false;
-                try {
-                    Method defaultMethod = actionMethod.getDeclaringClass().getDeclaredMethod(actionMethod.getName() + "$default$" + (i + 1));
-                    // Patch for scala defaults
-                    if (!Modifier.isStatic(actionMethod.getModifiers()) && actionMethod.getDeclaringClass().getSimpleName().endsWith("$")) {
-                        Object instance = actionMethod.getDeclaringClass().getDeclaredField("MODULE$").get(null);
-                        if (defaultMethod.invoke(instance).equals(args[i])) {
-                            isDefault = true;
-                        }
-                    }
-                } catch (NoSuchMethodException e) {
-                    //
-                }
-
-                // Bind the argument
-
-                if (isDefault) {
-                    newArgs.put(names[i], new Default(args[i]));
-                } else {
-                    Unbinder.unBind(newArgs, args[i], names[i], annotations);
-                }
-
-            }
-            try {
-
-                ActionDefinition actionDefinition = Router.reverse(action, newArgs);
-
-                if (_currentReverse.get() != null) {
-                    ActionDefinition currentActionDefinition = _currentReverse.get();
-                    currentActionDefinition.action = actionDefinition.action;
-                    currentActionDefinition.url = actionDefinition.url;
-                    currentActionDefinition.method = actionDefinition.method;
-                    currentActionDefinition.star = actionDefinition.star;
-                    currentActionDefinition.args = actionDefinition.args;
-
-                    _currentReverse.remove();
-                } else {
-                    throw new Redirect(actionDefinition.toString(), permanent);
-                }
-            } catch (NoRouteFoundException e) {
-                StackTraceElement element = PlayException.getInterestingStackTraceElement(e);
-                if (element != null) {
-                    throw new NoRouteFoundException(action, newArgs, Play.classes.getApplicationClass(element.getClassName()), element.getLineNumber());
-                } else {
-                    throw e;
-                }
-            }
-        } catch (Exception e) {
-            if (e instanceof Redirect) {
-                throw (Redirect) e;
-            }
-            if (e instanceof PlayException) {
-                throw (PlayException) e;
-            }
-            throw new UnexpectedException(e);
-        }
-    }
-
-    protected static boolean templateExists(String templateName) {
-        try {
-            TemplateLoader.load(template(templateName));
-            return true;
-        } catch (TemplateNotFoundException ex) {
-            return false;
-        }
-    }
-
-    /**
-     * Render a specific template
-     * @param templateName The template name
-     * @param args The template data
-     */
-    protected static void renderTemplate(String templateName, Object... args) {
-        // Template datas
-        Map<String, Object> templateBinding = new HashMap<String, Object>(16);
-        String[] names = LVEnhancerRuntime.getParamNames().varargs;
-        if(args != null && args.length > 0 && names == null)
-            throw new UnexpectedException("no varargs names while args.length > 0 !");
-        for(int i = 0; i < args.length; i++) {
-            templateBinding.put(names[i], args[i]);
-        }
-        renderTemplate(templateName, templateBinding);
-    }
-
-    /**
-     * Render a specific template.
-     *
-     * @param templateName The template name.
-     * @param args The template data.
-     */
-    protected static void renderTemplate(String templateName, Map<String,Object> args) {
-        // Template datas
-        Scope.RenderArgs templateBinding = Scope.RenderArgs.current();
-        templateBinding.data.putAll(args);
-        templateBinding.put("session", Scope.Session.current());
-        templateBinding.put("request", Http.Request.current());
-        templateBinding.put("flash", Scope.Flash.current());
-        templateBinding.put("params", Scope.Params.current());
-        templateBinding.put("errors", Validation.errors());
-        try {
-            Template template = TemplateLoader.load(template(templateName));
-            throw new RenderTemplate(template, templateBinding.data);
-        } catch (TemplateNotFoundException ex) {
-            if (ex.isSourceAvailable()) {
-                throw ex;
-            }
-            StackTraceElement element = PlayException.getInterestingStackTraceElement(ex);
-            if (element != null) {
-                ApplicationClass applicationClass = Play.classes.getApplicationClass(element.getClassName());
-                if (applicationClass != null) {
-                    throw new TemplateNotFoundException(templateName, applicationClass, element.getLineNumber());
-                }
-            }
-            throw ex;
-        }
-    }
-
-    /**
-     * Render the template corresponding to the action's package-class-method name (@see <code>template()</code>).
-     *
-     * @param args The template data.
-     */
-    protected static void renderTemplate(Map<String,Object> args) {
-        renderTemplate(template(), args);
-    }
-
-    /**
-     * Render the corresponding template (@see <code>template()</code>).
-     *
-     * @param args The template data
-     */
-    protected static void render(Object... args) {
-        String templateName = null;
-        if (args.length > 0 && args[0] instanceof String && LVEnhancerRuntime.getParamNames().mergeParamsAndVarargs()[0] == null) {
-            templateName = args[0].toString();
-        } else {
-            templateName = template();
-        }
-        renderTemplate(templateName, args);
-    }
-
-    /**
-     * Work out the default template to load for the invoked action.
-     * E.g. "controllers.Pages.index" returns "views/Pages/index.html".
-     */
-    protected static String template() {
-        final Request theRequest = Request.current();
-        final String format = theRequest.format;
-        String templateName = theRequest.action.replace(".", "/") + "." + (format == null ? "html" : format);
-        if (templateName.startsWith("@")) {
-            templateName = templateName.substring(1);
-            if (!templateName.contains(".")) {
-                templateName = theRequest.controller + "." + templateName;
-            }
-            templateName = templateName.replace(".", "/") + "." + (format == null ? "html" : format);
-        }
-        return templateName;
-    }
-
-    /**
-     * Work out the default template to load for the action.
-     * E.g. "controllers.Pages.index" returns "views/Pages/index.html".
-     */
-    protected static String template(String templateName) {
-        final Request theRequest = Request.current();
-        final String format = theRequest.format;
-        if (templateName.startsWith("@")) {
-            templateName = templateName.substring(1);
-            if (!templateName.contains(".")) {
-                templateName = theRequest.controller + "." + templateName;
-            }
-            templateName = templateName.replace(".", "/") + "." + (format == null ? "html" : format);
-        }
-        return templateName;
-    }
+//    /**
+//     * 302 Redirect to another action
+//     * @param action The fully qualified action name (ex: Application.index)
+//     * @param args Method arguments
+//     */
+//    public static void redirect(String action, Object... args) {
+//        redirect(action, false, args);
+//    }
+//
+//    /**
+//     * Redirect to another action
+//     * @param action The fully qualified action name (ex: Application.index)
+//     * @param permanent true -> 301, false -> 302
+//     * @param args Method arguments
+//     */
+//    protected static void redirect(String action, boolean permanent, Object... args) {
+//        try {
+//            Map<String, Object> newArgs = new HashMap<String, Object>(args.length);
+//            Method actionMethod = (Method) ActionInvoker.getActionMethod(action)[1];
+//            String[] names = (String[]) actionMethod.getDeclaringClass().getDeclaredField("$" + actionMethod.getName() + LVEnhancer.computeMethodHash(actionMethod.getParameterTypes())).get(null);
+//            for (int i = 0; i < names.length && i < args.length; i++) {
+//                Annotation[] annotations = actionMethod.getParameterAnnotations()[i];
+//                boolean isDefault = false;
+//                try {
+//                    Method defaultMethod = actionMethod.getDeclaringClass().getDeclaredMethod(actionMethod.getName() + "$default$" + (i + 1));
+//                    // Patch for scala defaults
+//                    if (!Modifier.isStatic(actionMethod.getModifiers()) && actionMethod.getDeclaringClass().getSimpleName().endsWith("$")) {
+//                        Object instance = actionMethod.getDeclaringClass().getDeclaredField("MODULE$").get(null);
+//                        if (defaultMethod.invoke(instance).equals(args[i])) {
+//                            isDefault = true;
+//                        }
+//                    }
+//                } catch (NoSuchMethodException e) {
+//                    //
+//                }
+//
+//                // Bind the argument
+//
+//                if (isDefault) {
+//                    newArgs.put(names[i], new Default(args[i]));
+//                } else {
+//                    Unbinder.unBind(newArgs, args[i], names[i], annotations);
+//                }
+//
+//            }
+//            try {
+//
+//                ActionDefinition actionDefinition = Router.reverse(action, newArgs);
+//
+//                if (_currentReverse.get() != null) {
+//                    ActionDefinition currentActionDefinition = _currentReverse.get();
+//                    currentActionDefinition.action = actionDefinition.action;
+//                    currentActionDefinition.url = actionDefinition.url;
+//                    currentActionDefinition.method = actionDefinition.method;
+//                    currentActionDefinition.star = actionDefinition.star;
+//                    currentActionDefinition.args = actionDefinition.args;
+//
+//                    _currentReverse.remove();
+//                } else {
+//                    throw new Redirect(actionDefinition.toString(), permanent);
+//                }
+//            } catch (NoRouteFoundException e) {
+//                StackTraceElement element = PlayException.getInterestingStackTraceElement(e);
+//                if (element != null) {
+//                    throw new NoRouteFoundException(action, newArgs, Play.classes.getApplicationClass(element.getClassName()), element.getLineNumber());
+//                } else {
+//                    throw e;
+//                }
+//            }
+//        } catch (Exception e) {
+//            if (e instanceof Redirect) {
+//                throw (Redirect) e;
+//            }
+//            if (e instanceof PlayException) {
+//                throw (PlayException) e;
+//            }
+//            throw new UnexpectedException(e);
+//        }
+//    }
+//
+//    protected static boolean templateExists(String templateName) {
+//        try {
+//            TemplateLoader.load(template(templateName));
+//            return true;
+//        } catch (TemplateNotFoundException ex) {
+//            return false;
+//        }
+//    }
+//
+//    /**
+//     * Render a specific template
+//     * @param templateName The template name
+//     * @param args The template data
+//     */
+//    protected static void renderTemplate(String templateName, Object... args) {
+//        // Template datas
+//        Map<String, Object> templateBinding = new HashMap<String, Object>(16);
+//        String[] names = LVEnhancerRuntime.getParamNames().varargs;
+//        if(args != null && args.length > 0 && names == null)
+//            throw new UnexpectedException("no varargs names while args.length > 0 !");
+//        for(int i = 0; i < args.length; i++) {
+//            templateBinding.put(names[i], args[i]);
+//        }
+//        renderTemplate(templateName, templateBinding);
+//    }
+//
+//    /**
+//     * Render a specific template.
+//     *
+//     * @param templateName The template name.
+//     * @param args The template data.
+//     */
+//    protected static void renderTemplate(String templateName, Map<String,Object> args) {
+//        // Template datas
+//        Scope.RenderArgs templateBinding = Scope.RenderArgs.current();
+//        templateBinding.data.putAll(args);
+//        templateBinding.put("session", Scope.Session.current());
+//        templateBinding.put("request", Http.Request.current());
+//        templateBinding.put("flash", Scope.Flash.current());
+//        templateBinding.put("params", Scope.Params.current());
+//        templateBinding.put("errors", Validation.errors());
+//        try {
+//            Template template = TemplateLoader.load(template(templateName));
+//            throw new RenderTemplate(template, templateBinding.data);
+//        } catch (TemplateNotFoundException ex) {
+//            if (ex.isSourceAvailable()) {
+//                throw ex;
+//            }
+//            StackTraceElement element = PlayException.getInterestingStackTraceElement(ex);
+//            if (element != null) {
+//                ApplicationClass applicationClass = Play.classes.getApplicationClass(element.getClassName());
+//                if (applicationClass != null) {
+//                    throw new TemplateNotFoundException(templateName, applicationClass, element.getLineNumber());
+//                }
+//            }
+//            throw ex;
+//        }
+//    }
+//
+//    /**
+//     * Render the template corresponding to the action's package-class-method name (@see <code>template()</code>).
+//     *
+//     * @param args The template data.
+//     */
+//    protected static void renderTemplate(Map<String,Object> args) {
+//        renderTemplate(template(), args);
+//    }
+//
+//    /**
+//     * Render the corresponding template (@see <code>template()</code>).
+//     *
+//     * @param args The template data
+//     */
+//    protected static void render(Object... args) {
+//        String templateName = null;
+//        if (args.length > 0 && args[0] instanceof String && LVEnhancerRuntime.getParamNames().mergeParamsAndVarargs()[0] == null) {
+//            templateName = args[0].toString();
+//        } else {
+//            templateName = template();
+//        }
+//        renderTemplate(templateName, args);
+//    }
+//
+//    /**
+//     * Work out the default template to load for the invoked action.
+//     * E.g. "controllers.Pages.index" returns "views/Pages/index.html".
+//     */
+//    protected static String template() {
+//        final Request theRequest = Request.current();
+//        final String format = theRequest.format;
+//        String templateName = theRequest.action.replace(".", "/") + "." + (format == null ? "html" : format);
+//        if (templateName.startsWith("@")) {
+//            templateName = templateName.substring(1);
+//            if (!templateName.contains(".")) {
+//                templateName = theRequest.controller + "." + templateName;
+//            }
+//            templateName = templateName.replace(".", "/") + "." + (format == null ? "html" : format);
+//        }
+//        return templateName;
+//    }
+//
+//    /**
+//     * Work out the default template to load for the action.
+//     * E.g. "controllers.Pages.index" returns "views/Pages/index.html".
+//     */
+//    protected static String template(String templateName) {
+//        final Request theRequest = Request.current();
+//        final String format = theRequest.format;
+//        if (templateName.startsWith("@")) {
+//            templateName = templateName.substring(1);
+//            if (!templateName.contains(".")) {
+//                templateName = theRequest.controller + "." + templateName;
+//            }
+//            templateName = templateName.replace(".", "/") + "." + (format == null ? "html" : format);
+//        }
+//        return templateName;
+//    }
 
     /**
      * Retrieve annotation for the action method
@@ -794,72 +768,72 @@ public class Controller implements ControllerSupport {
         return Http.Request.current().controllerClass;
     }
 
-    /**
-     * Call the parent action adding this objects to the params scope
-     */
-    @Deprecated
-    protected static void parent(Object... args) {
-        Map<String, Object> map = new HashMap<String, Object>(16);
-        String[] names = LVEnhancerRuntime.getParamNames().mergeParamsAndVarargs();
-        for(int i = 0; i < names.length; i++)
-            map.put(names[i], args[i]);
-        parent(map);
-    }
-
-    /**
-     * Call the parent method
-     */
-    @Deprecated
-    protected static void parent() {
-        parent(new HashMap<String, Object>(0));
-    }
-
-    /**
-     * Call the parent action adding this objects to the params scope
-     */
-    @Deprecated
-    protected static void parent(Map<String, Object> map) {
-        try {
-            Method method = Http.Request.current().invokedMethod;
-            String name = method.getName();
-            Class<?> clazz = method.getDeclaringClass().getSuperclass();
-            Method superMethod = null;
-            while (!clazz.getName().equals("play.mvc.Controller") && !clazz.getName().equals("java.lang.Object")) {
-                for (Method m : clazz.getDeclaredMethods()) {
-                    if (m.getName().equalsIgnoreCase(name) && Modifier.isPublic(m.getModifiers()) && Modifier.isStatic(m.getModifiers())) {
-                        superMethod = m;
-                        break;
-                    }
-                }
-                if (superMethod != null) {
-                    break;
-                }
-                clazz = clazz.getSuperclass();
-            }
-            if (superMethod == null) {
-                throw new RuntimeException("PAF");
-            }
-            Map<String, String> mapss = new HashMap<String, String>(map.size());
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                Object value = entry.getValue();
-                mapss.put(entry.getKey(), value == null ? null : value.toString());
-            }
-            Scope.Params.current().__mergeWith(mapss);
-            ControllerInstrumentation.initActionCall();
-            Java.invokeStatic(superMethod, ActionInvoker.getActionMethodArgs(superMethod, null));
-        } catch (InvocationTargetException ex) {
-            // It's a Result ? (expected)
-            if (ex.getTargetException() instanceof Result) {
-                throw (Result) ex.getTargetException();
-            } else {
-                throw new RuntimeException(ex.getTargetException());
-            }
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    /**
+//     * Call the parent action adding this objects to the params scope
+//     */
+//    @Deprecated
+//    protected static void parent(Object... args) {
+//        Map<String, Object> map = new HashMap<String, Object>(16);
+//        String[] names = LVEnhancerRuntime.getParamNames().mergeParamsAndVarargs();
+//        for(int i = 0; i < names.length; i++)
+//            map.put(names[i], args[i]);
+//        parent(map);
+//    }
+//
+//    /**
+//     * Call the parent method
+//     */
+//    @Deprecated
+//    protected static void parent() {
+//        parent(new HashMap<String, Object>(0));
+//    }
+//
+//    /**
+//     * Call the parent action adding this objects to the params scope
+//     */
+//    @Deprecated
+//    protected static void parent(Map<String, Object> map) {
+//        try {
+//            Method method = Http.Request.current().invokedMethod;
+//            String name = method.getName();
+//            Class<?> clazz = method.getDeclaringClass().getSuperclass();
+//            Method superMethod = null;
+//            while (!clazz.getName().equals("play.mvc.Controller") && !clazz.getName().equals("java.lang.Object")) {
+//                for (Method m : clazz.getDeclaredMethods()) {
+//                    if (m.getName().equalsIgnoreCase(name) && Modifier.isPublic(m.getModifiers()) && Modifier.isStatic(m.getModifiers())) {
+//                        superMethod = m;
+//                        break;
+//                    }
+//                }
+//                if (superMethod != null) {
+//                    break;
+//                }
+//                clazz = clazz.getSuperclass();
+//            }
+//            if (superMethod == null) {
+//                throw new RuntimeException("PAF");
+//            }
+//            Map<String, String> mapss = new HashMap<String, String>(map.size());
+//            for (Map.Entry<String, Object> entry : map.entrySet()) {
+//                Object value = entry.getValue();
+//                mapss.put(entry.getKey(), value == null ? null : value.toString());
+//            }
+//            Scope.Params.current().__mergeWith(mapss);
+//            ControllerInstrumentation.initActionCall();
+//            Java.invokeStatic(superMethod, ActionInvoker.getActionMethodArgs(superMethod, null));
+//        } catch (InvocationTargetException ex) {
+//            // It's a Result ? (expected)
+//            if (ex.getTargetException() instanceof Result) {
+//                throw (Result) ex.getTargetException();
+//            } else {
+//                throw new RuntimeException(ex.getTargetException());
+//            }
+//        } catch (RuntimeException e) {
+//            throw e;
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     /**
      * Suspend the current request for a specified amount of time.
@@ -946,45 +920,45 @@ public class Controller implements ControllerSupport {
         if (isRestoring) {
             //we are restoring after suspend
 
-            // localVariablesState
-            Stack<MethodExecution> currentMethodExecutions = (Stack<MethodExecution>) Request.current().args.get(ActionInvoker.CONTINUATIONS_STORE_LOCAL_VARIABLE_NAMES);
-            if(currentMethodExecutions != null)
-                LVEnhancer.LVEnhancerRuntime.reinitRuntime(currentMethodExecutions);
+//            // localVariablesState
+//            Stack<MethodExecution> currentMethodExecutions = (Stack<MethodExecution>) Request.current().args.get(ActionInvoker.CONTINUATIONS_STORE_LOCAL_VARIABLE_NAMES);
+//            if(currentMethodExecutions != null)
+//                LVEnhancer.LVEnhancerRuntime.reinitRuntime(currentMethodExecutions);
 
-            // renderArgs
-            Scope.RenderArgs renderArgs = (Scope.RenderArgs) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_RENDER_ARGS);
-            Scope.RenderArgs.current.set( renderArgs);
-
-            // Params
-            // We know that the params are partially reprocessed during awake(Before now), but here we restore the correct values as
-            // they where when we performed the await();
-            Map params = (Map) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_PARAMS);
-            Scope.Params.current().all().clear();
-            Scope.Params.current().all().putAll(params);
-
-            // Validations
-            Validation validation = (Validation) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONS);
-            Validation.current.set(validation);
-            ValidationPlugin.keys.set( (Map<Object, String>) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONPLUGIN_KEYS) );
+//            // renderArgs
+//            Scope.RenderArgs renderArgs = (Scope.RenderArgs) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_RENDER_ARGS);
+//            Scope.RenderArgs.current.set( renderArgs);
+//
+//            // Params
+//            // We know that the params are partially reprocessed during awake(Before now), but here we restore the correct values as
+//            // they where when we performed the await();
+//            Map params = (Map) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_PARAMS);
+//            Scope.Params.current().all().clear();
+//            Scope.Params.current().all().putAll(params);
+//
+//            // Validations
+//            Validation validation = (Validation) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONS);
+//            Validation.current.set(validation);
+//            ValidationPlugin.keys.set( (Map<Object, String>) Request.current().args.remove(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONPLUGIN_KEYS) );
 
         } else {
             // we are storing before suspend
 
-            // localVariablesState
-            Stack<MethodExecution> currentMethodExecutions = new Stack<LVEnhancer.MethodExecution>();
-            currentMethodExecutions.addAll(LVEnhancer.LVEnhancerRuntime.getCurrentMethodParams());
-            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_LOCAL_VARIABLE_NAMES, currentMethodExecutions);
+//            // localVariablesState
+//            Stack<MethodExecution> currentMethodExecutions = new Stack<LVEnhancer.MethodExecution>();
+//            currentMethodExecutions.addAll(LVEnhancer.LVEnhancerRuntime.getCurrentMethodParams());
+//            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_LOCAL_VARIABLE_NAMES, currentMethodExecutions);
 
-            // renderArgs
-            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_RENDER_ARGS, Scope.RenderArgs.current());
-
-             // Params
-             // Store the actual params values so we can restore the exact same state when awaking.
-             Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_PARAMS, new HashMap(Scope.Params.current().data));
-
-            // Validations
-            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONS, Validation.current());
-            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONPLUGIN_KEYS, ValidationPlugin.keys.get());
+//            // renderArgs
+//            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_RENDER_ARGS, Scope.RenderArgs.current());
+//
+//             // Params
+//             // Store the actual params values so we can restore the exact same state when awaking.
+//             Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_PARAMS, new HashMap(Scope.Params.current().data));
+//
+//            // Validations
+//            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONS, Validation.current());
+//            Request.current().args.put(ActionInvoker.CONTINUATIONS_STORE_VALIDATIONPLUGIN_KEYS, ValidationPlugin.keys.get());
 
 
         }
@@ -1079,26 +1053,26 @@ public class Controller implements ControllerSupport {
         throw new Suspend(future);
     }
 
-    /**
-     * Don't use this directly if you don't know why
-     */
-    public static ThreadLocal<ActionDefinition> _currentReverse = new ThreadLocal<ActionDefinition>();
-
-    /**
-     * @todo - this "Usage" example below doesn't make sense.
-     *
-     * Usage:
-     *
-     * <code>
-     * ActionDefinition action = reverse(); {
-     *     Application.anyAction(anyParam, "toto");
-     * }
-     * String url = action.url;
-     * </code>
-     */
-    protected static ActionDefinition reverse() {
-        ActionDefinition actionDefinition = new ActionDefinition();
-        _currentReverse.set(actionDefinition);
-        return actionDefinition;
-    }
+//    /**
+//     * Don't use this directly if you don't know why
+//     */
+//    public static ThreadLocal<ActionDefinition> _currentReverse = new ThreadLocal<ActionDefinition>();
+//
+//    /**
+//     * @todo - this "Usage" example below doesn't make sense.
+//     *
+//     * Usage:
+//     *
+//     * <code>
+//     * ActionDefinition action = reverse(); {
+//     *     Application.anyAction(anyParam, "toto");
+//     * }
+//     * String url = action.url;
+//     * </code>
+//     */
+//    protected static ActionDefinition reverse() {
+//        ActionDefinition actionDefinition = new ActionDefinition();
+//        _currentReverse.set(actionDefinition);
+//        return actionDefinition;
+//    }
 }

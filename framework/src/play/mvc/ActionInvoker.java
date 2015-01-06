@@ -426,20 +426,20 @@ public class ActionInvoker {
                 // Of course
                 throw (Result) o;
             }
-            if (o instanceof InputStream) {
-                Controller.renderBinary((InputStream) o);
-            }
-            if (o instanceof File) {
-                Controller.renderBinary((File) o);
-            }
-            if (o instanceof Map) {
-                Controller.renderTemplate((Map<String, Object>) o);
-            }
-            if (o instanceof Object[]) {
-                Controller.render(o);
-            }
-
-            Controller.renderHtml(o);
+//            if (o instanceof InputStream) {
+//                Controller.renderBinary((InputStream) o);
+//            }
+//            if (o instanceof File) {
+//                Controller.renderBinary((File) o);
+//            }
+//            if (o instanceof Map) {
+//                Controller.renderTemplate((Map<String, Object>) o);
+//            }
+//            if (o instanceof Object[]) {
+//                Controller.render(o);
+//            }
+//
+//            Controller.renderHtml(o);
         }
     }
 
