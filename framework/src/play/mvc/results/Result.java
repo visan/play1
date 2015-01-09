@@ -19,14 +19,14 @@ public abstract class Result extends FastRuntimeException {
     public abstract void apply(Http.Request request, Http.Response response);
 
     protected void setContentTypeIfNotSet(Http.Response response, String contentType) {
-        response.setContentTypeIfNotSet(contentType);
+//        response.setContentTypeIfNotSet(contentType);
     }
 
     /**
      * The encoding that should be used when writing this response to the client
      */
     protected String getEncoding() {
-        return Http.Response.current().encoding;
+        return null;//Http.Response.current().encoding;
     }
 
 }

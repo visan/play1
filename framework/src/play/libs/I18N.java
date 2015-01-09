@@ -1,10 +1,11 @@
 package play.libs;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import play.Play;
-import play.i18n.Lang;
+
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * I18N utils
@@ -160,17 +161,17 @@ public class I18N {
         return currency;
     }
 
-    public static String getDateFormat() {
-        final String localizedDateFormat = Play.configuration.getProperty("date.format." + Lang.get());
-        if (!StringUtils.isEmpty(localizedDateFormat)) {
-            return localizedDateFormat;
-        }
-        final String globalDateFormat = Play.configuration.getProperty("date.format");
-        if (!StringUtils.isEmpty(globalDateFormat)) {
-            return globalDateFormat;
-        }
-        // Default value. It's completely arbitrary.
-        return "yyyy-MM-dd";
-    }
+//    public static String getDateFormat() {
+//        final String localizedDateFormat = Play.configuration.getProperty("date.format." + Lang.get());
+//        if (!StringUtils.isEmpty(localizedDateFormat)) {
+//            return localizedDateFormat;
+//        }
+//        final String globalDateFormat = Play.configuration.getProperty("date.format");
+//        if (!StringUtils.isEmpty(globalDateFormat)) {
+//            return globalDateFormat;
+//        }
+//        // Default value. It's completely arbitrary.
+//        return "yyyy-MM-dd";
+//    }
 
 }

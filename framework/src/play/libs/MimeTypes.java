@@ -102,7 +102,7 @@ public class MimeTypes {
         Http.Response currentResponse = Http.Response.current();
 
         if (currentResponse != null) {
-            charset = currentResponse.encoding;
+            charset = "";//currentResponse.encoding;
         }
         else {
             charset = Play.defaultWebEncoding;

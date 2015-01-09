@@ -1,27 +1,17 @@
 package play;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import java.util.ArrayList;
-
 import play.Play.Mode;
 import play.exceptions.PlayException;
 import play.exceptions.UnexpectedException;
-import play.i18n.Lang;
 import play.libs.F;
 import play.libs.F.Promise;
 import play.utils.PThreadFactory;
+
+import java.lang.annotation.Annotation;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Run some code in a Play! context
@@ -186,7 +176,7 @@ public class Invoker {
          */
         protected void preInit() {
             // clear language for this request - we're resolving it later when it is needed
-            Lang.clear();
+//            Lang.clear();
         }
 
         /**

@@ -18,7 +18,7 @@ public class BadRequest extends Result {
 	
     @Override
     public void apply(Request request, Response response) {
-        response.status = Http.StatusCode.BAD_REQUEST;
+//        response.status = Http.StatusCode.BAD_REQUEST;
     }
 
 }

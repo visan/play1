@@ -12,10 +12,10 @@ import play.Logger;
 import play.Play;
 import play.PlayPlugin;
 import play.classloading.ApplicationClasses.ApplicationClass;
-import play.data.binding.Binder;
-import play.data.binding.NoBinding;
-import play.data.binding.ParamNode;
-import play.data.binding.RootParamNode;
+//import play.data.binding.Binder;
+//import play.data.binding.NoBinding;
+//import play.data.binding.ParamNode;
+//import play.data.binding.RootParamNode;
 import play.db.DB;
 import play.db.DBConfig;
 import play.db.Model;
@@ -52,60 +52,60 @@ public class JPAPlugin extends PlayPlugin {
 
     public static boolean autoTxs = true;
 
-    @Override
-    public Object bind(RootParamNode rootParamNode, String name, Class clazz, java.lang.reflect.Type type, Annotation[] annotations) {
+//    @Override
+    public Object bind(/*RootParamNode rootParamNode, */String name, Class clazz, java.lang.reflect.Type type, Annotation[] annotations) {
         // TODO need to be more generic in order to work with JPASupport
     	if(clazz.isAnnotationPresent(Entity.class)) {
 
-            ParamNode paramNode = rootParamNode.getChild(name, true);
-
-            String[] keyNames = new JPAModelLoader(clazz).keyNames();
-            ParamNode[] ids = new ParamNode[keyNames.length];
-            // Collect the matching ids
-            int i = 0;
-            for (String keyName : keyNames) {
-                ids[i++] = paramNode.getChild(keyName, true);
-            }
-            if (ids != null && ids.length > 0) {
-                try {
-                    EntityManager em = JPABase.getJPAConfig(clazz).getJPAContext().em();
-                    StringBuilder q = new StringBuilder().append("from ").append(clazz.getName()).append(" o where");
-                    int keyIdx = 1;
-                    for (String keyName : keyNames) {
-                            q.append(" o.").append(keyName).append(" = ?").append(keyIdx++).append(" and ");
-                    }
-                    if (q.length() > 4) {
-                        q = q.delete(q.length() - 4, q.length());
-                    }
-                    Query query = em.createQuery(q.toString());
-                    // The primary key can be a composite.
-                    Class[] pk = new JPAModelLoader(clazz).keyTypes();
-                    int j = 0;
-                    for (ParamNode id : ids) {
-                        if (id.getValues() == null || id.getValues().length == 0 || id.getFirstValue(null)== null || id.getFirstValue(null).trim().length() <= 0 ) {
-                             // We have no ids, it is a new entity
-                            return GenericModel.create(rootParamNode, name, clazz, annotations);
-                        }
-                        query.setParameter(j + 1, Binder.directBind(id.getOriginalKey(), annotations, id.getValues()[0], pk[j++], null));
-
-                    }
-                    Object o = query.getSingleResult();
-                    return GenericModel.edit(rootParamNode, name, o, annotations);
-                } catch (NoResultException e) {
-                    // ok
-                } catch (Exception e) {
-                    throw new UnexpectedException(e);
-                }
-            }
-            return GenericModel.create(rootParamNode, name, clazz, annotations);
+//            ParamNode paramNode = rootParamNode.getChild(name, true);
+//
+//            String[] keyNames = new JPAModelLoader(clazz).keyNames();
+//            ParamNode[] ids = new ParamNode[keyNames.length];
+//            // Collect the matching ids
+//            int i = 0;
+//            for (String keyName : keyNames) {
+//                ids[i++] = paramNode.getChild(keyName, true);
+//            }
+//            if (ids != null && ids.length > 0) {
+//                try {
+//                    EntityManager em = JPABase.getJPAConfig(clazz).getJPAContext().em();
+//                    StringBuilder q = new StringBuilder().append("from ").append(clazz.getName()).append(" o where");
+//                    int keyIdx = 1;
+//                    for (String keyName : keyNames) {
+//                            q.append(" o.").append(keyName).append(" = ?").append(keyIdx++).append(" and ");
+//                    }
+//                    if (q.length() > 4) {
+//                        q = q.delete(q.length() - 4, q.length());
+//                    }
+//                    Query query = em.createQuery(q.toString());
+//                    // The primary key can be a composite.
+//                    Class[] pk = new JPAModelLoader(clazz).keyTypes();
+//                    int j = 0;
+//                    for (ParamNode id : ids) {
+//                        if (id.getValues() == null || id.getValues().length == 0 || id.getFirstValue(null)== null || id.getFirstValue(null).trim().length() <= 0 ) {
+//                             // We have no ids, it is a new entity
+//                            return GenericModel.create(rootParamNode, name, clazz, annotations);
+//                        }
+//                        query.setParameter(j + 1, Binder.directBind(id.getOriginalKey(), annotations, id.getValues()[0], pk[j++], null));
+//
+//                    }
+//                    Object o = query.getSingleResult();
+//                    return GenericModel.edit(rootParamNode, name, o, annotations);
+//                } catch (NoResultException e) {
+//                    // ok
+//                } catch (Exception e) {
+//                    throw new UnexpectedException(e);
+//                }
+//            }
+            return GenericModel.create(/*rootParamNode, */name, clazz, annotations);
         }
         return null;
     }
 
-    @Override
-    public Object bindBean(RootParamNode rootParamNode, String name, Object bean) {
+//    @Override
+    public Object bindBean(/*RootParamNode rootParamNode, */String name, Object bean) {
         if (bean instanceof JPABase) {
-            return GenericModel.edit(rootParamNode, name, bean, null);
+            return GenericModel.edit(/*rootParamNode, */name, bean, null);
         }
         return null;
     }
@@ -520,13 +520,13 @@ public class JPAPlugin extends PlayPlugin {
                 if (f.isAnnotationPresent(Transient.class)) {
                     continue;
                 }
-                if (f.isAnnotationPresent(NoBinding.class)) {
-                    NoBinding a = f.getAnnotation(NoBinding.class);
-                    List<String> values = Arrays.asList(a.value());
-                    if (values.contains("*")) {
-                        continue;
-                    }
-                }
+//                if (f.isAnnotationPresent(NoBinding.class)) {
+//                    NoBinding a = f.getAnnotation(NoBinding.class);
+//                    List<String> values = Arrays.asList(a.value());
+//                    if (values.contains("*")) {
+//                        continue;
+//                    }
+//                }
                 Model.Property mp = buildProperty(f);
                 if (mp != null) {
                     properties.add(mp);

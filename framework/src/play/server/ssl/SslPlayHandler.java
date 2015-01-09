@@ -18,7 +18,7 @@ public class SslPlayHandler extends PlayHandler {
     @Override
     public Request parseRequest(ChannelHandlerContext ctx, HttpRequest nettyRequest, MessageEvent e) throws Exception {
         Request request = super.parseRequest(ctx, nettyRequest, e);
-        request.secure = true;
+//        request.secure = true;
         return request;
     }
 

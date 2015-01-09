@@ -185,7 +185,7 @@ public class WSUrlFetch implements WSImpl {
                 }
 
                 if (this.oauthToken != null && this.oauthSecret != null) {
-                    OAuthConsumer consumer = new DefaultOAuthConsumer(oauthInfo.consumerKey, oauthInfo.consumerSecret);
+                    OAuthConsumer consumer = null;//new DefaultOAuthConsumer(oauthInfo.consumerKey, oauthInfo.consumerSecret);
                     consumer.setTokenWithSecret(oauthToken, oauthSecret);
                     consumer.sign(connection);
                 }

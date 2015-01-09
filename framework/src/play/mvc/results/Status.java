@@ -13,6 +13,6 @@ public class Status extends Result {
     }
 
     public void apply(Request request, Response response) {
-        response.status = code;
+//        response.status = code;
     }
 }

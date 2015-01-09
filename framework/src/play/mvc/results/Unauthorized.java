@@ -17,7 +17,7 @@ public class Unauthorized extends Result {
     }
 
     public void apply(Request request, Response response) {
-        response.status = Http.StatusCode.UNAUTHORIZED;
-        response.setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
+//        response.status = Http.StatusCode.UNAUTHORIZED;
+//        response.setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
     }
 }

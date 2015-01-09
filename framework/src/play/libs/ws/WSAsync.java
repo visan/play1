@@ -15,7 +15,7 @@ import play.Logger;
 import play.Play;
 import play.libs.F.Promise;
 import play.libs.MimeTypes;
-import play.libs.OAuth.ServiceInfo;
+//import play.libs.OAuth.ServiceInfo;
 import play.libs.WS.HttpResponse;
 import play.libs.WS.WSImpl;
 import play.libs.WS.WSRequest;
@@ -332,14 +332,14 @@ public class WSAsync implements WSImpl {
         }
 
         private WSRequest sign() {
-            if (this.oauthToken != null && this.oauthSecret != null) {
-                WSOAuthConsumer consumer = new WSOAuthConsumer(oauthInfo, oauthToken, oauthSecret);
-                try {
-                    consumer.sign(this, this.type);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+//            if (this.oauthToken != null && this.oauthSecret != null) {
+//                WSOAuthConsumer consumer = new WSOAuthConsumer(oauthInfo, oauthToken, oauthSecret);
+//                try {
+//                    consumer.sign(this, this.type);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
             return this;
         }
 
@@ -607,10 +607,10 @@ public class WSAsync implements WSImpl {
             super(consumerKey, consumerSecret);
         }
 
-        public WSOAuthConsumer(ServiceInfo info, String token, String secret) {
-            super(info.consumerKey, info.consumerSecret);
-            setTokenWithSecret(token, secret);
-        }
+//        public WSOAuthConsumer(ServiceInfo info, String token, String secret) {
+//            super(info.consumerKey, info.consumerSecret);
+//            setTokenWithSecret(token, secret);
+//        }
 
         @Override
         protected HttpRequest wrap(Object request) {

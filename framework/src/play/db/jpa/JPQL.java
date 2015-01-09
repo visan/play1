@@ -1,17 +1,14 @@
 package play.db.jpa;
 
-import java.util.List;
-import java.util.Map;
+import play.Play;
+import play.db.DBConfig;
+import play.db.jpa.GenericModel.JPAQuery;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
-import play.Play;
-import play.data.binding.ParamNode;
-import play.data.binding.RootParamNode;
-import play.db.DBConfig;
-import play.db.jpa.GenericModel.JPAQuery;
-import play.mvc.Scope.Params;
+import java.util.List;
+import java.util.Map;
+//import play.mvc.Scope.Params;
 
 public class JPQL {
 
@@ -107,12 +104,12 @@ public class JPQL {
         return (JPABase) results.get(0);
     }
 
-    public JPABase create(String entity, String name, Params params) throws Exception {
+    public JPABase create(String entity, String name/*, Params params*/) throws Exception {
         Object o = Play.classloader.loadClass(entity).newInstance();
 
-        RootParamNode rootParamNode = ParamNode.convert(params.all());
+//        RootParamNode rootParamNode = null;//ParamNode.convert(params.all());
 
-        return ((GenericModel) o).edit(rootParamNode, name);
+        return ((GenericModel) o).edit(/*rootParamNode, */name);
     }
 
     public String createFindByQuery(String entityName, String entityClass, String query, Object... params) {

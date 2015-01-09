@@ -18,7 +18,7 @@ public class RenderText extends Result {
 
     public void apply(Request request, Response response) {
         try {
-            setContentTypeIfNotSet(response, "text/plain; charset=" + Http.Response.current().encoding);
+//            setContentTypeIfNotSet(response, "text/plain; charset=" + Http.Response.current().encoding);
             response.out.write(text.getBytes(getEncoding()));
         } catch(Exception e) {
             throw new UnexpectedException(e);

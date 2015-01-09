@@ -5,36 +5,18 @@ import play.Play;
 import play.PlayPlugin;
 import play.classloading.ApplicationClasses;
 import play.classloading.ApplicationClassloader;
-import play.data.binding.RootParamNode;
 import play.db.Model;
 import play.exceptions.UnexpectedException;
 import play.mvc.Http;
-import play.mvc.Router;
 import play.mvc.results.Result;
-import play.templates.BaseTemplate;
-import play.templates.Template;
-import play.test.BaseTest;
-import play.test.TestEngine;
 import play.vfs.VirtualFile;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class handling all plugins used by Play.
@@ -571,35 +553,35 @@ public class PluginCollection {
         }
     }
 
-    public Object bind(RootParamNode rootParamNode, String name, Class<?> clazz, Type type, Annotation[] annotations){
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            Object result = plugin.bind(rootParamNode, name, clazz, type, annotations);
-            if (result != null) {
-                return result;
-            }
-        }
-        return null;
-    }
-
-    public Object bindBean(RootParamNode rootParamNode, String name, Object bean) {
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            Object result = plugin.bindBean(rootParamNode, name, bean);
-            if (result != null) {
-                return result;
-            }
-        }
-        return null;
-    }
-
-    public Map<String, Object> unBind(Object src, String name) {
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            Map<String, Object> r = plugin.unBind(src, name);
-            if (r != null) {
-                return r;
-            }
-        }
-        return null;
-    }
+//    public Object bind(RootParamNode rootParamNode, String name, Class<?> clazz, Type type, Annotation[] annotations){
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            Object result = plugin.bind(rootParamNode, name, clazz, type, annotations);
+//            if (result != null) {
+//                return result;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    public Object bindBean(RootParamNode rootParamNode, String name, Object bean) {
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            Object result = plugin.bindBean(rootParamNode, name, bean);
+//            if (result != null) {
+//                return result;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    public Map<String, Object> unBind(Object src, String name) {
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            Map<String, Object> r = plugin.unBind(src, name);
+//            if (r != null) {
+//                return r;
+//            }
+//        }
+//        return null;
+//    }
 
     public Object willBeValidated(Object value) {
         for (PlayPlugin plugin : getEnabledPlugins()) {
@@ -655,11 +637,11 @@ public class PluginCollection {
         }
     }
 
-    public void onRequestRouting(Router.Route route) {
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            plugin.onRequestRouting(route);
-        }
-    }
+//    public void onRequestRouting(Router.Route route) {
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            plugin.onRequestRouting(route);
+//        }
+//    }
 
     public void onRoutesLoaded() {
         for (PlayPlugin plugin : getEnabledPlugins()) {
@@ -694,25 +676,25 @@ public class PluginCollection {
         return list;
     }
 
-    public String overrideTemplateSource(BaseTemplate template, String source) {
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            String newSource = plugin.overrideTemplateSource(template, source);
-            if(newSource != null) {
-                source = newSource;
-            }
-        }
-        return source;
-    }
-
-    public Template loadTemplate(VirtualFile file) {
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            Template pluginProvided = plugin.loadTemplate(file);
-            if(pluginProvided != null) {
-                return pluginProvided;
-            }
-        }
-        return null;
-    }
+//    public String overrideTemplateSource(BaseTemplate template, String source) {
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            String newSource = plugin.overrideTemplateSource(template, source);
+//            if(newSource != null) {
+//                source = newSource;
+//            }
+//        }
+//        return source;
+//    }
+//
+//    public Template loadTemplate(VirtualFile file) {
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            Template pluginProvided = plugin.loadTemplate(file);
+//            if(pluginProvided != null) {
+//                return pluginProvided;
+//            }
+//        }
+//        return null;
+//    }
 
     public void afterFixtureLoad() {
         for (PlayPlugin plugin : getEnabledPlugins()) {
@@ -720,37 +702,37 @@ public class PluginCollection {
         }
     }
 
-    public TestEngine.TestResults runTest(Class<BaseTest> clazz) {
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            TestEngine.TestResults pluginTestResults = plugin.runTest(clazz);
-            if (pluginTestResults != null) {
-                return pluginTestResults;
-            }
-        }
-        return null;
-    }
+//    public TestEngine.TestResults runTest(Class<BaseTest> clazz) {
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            TestEngine.TestResults pluginTestResults = plugin.runTest(clazz);
+//            if (pluginTestResults != null) {
+//                return pluginTestResults;
+//            }
+//        }
+//        return null;
+//    }
 
-    public Collection<Class> getUnitTests() {
-        Set<Class> allPluginTests = new HashSet<Class>();
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            Collection<Class> unitTests = plugin.getUnitTests();
-            if(unitTests != null) {
-                allPluginTests.addAll(unitTests);
-            }
-        }
-        
-        return allPluginTests;
-    }
+//    public Collection<Class> getUnitTests() {
+//        Set<Class> allPluginTests = new HashSet<Class>();
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            Collection<Class> unitTests = plugin.getUnitTests();
+//            if(unitTests != null) {
+//                allPluginTests.addAll(unitTests);
+//            }
+//        }
+//
+//        return allPluginTests;
+//    }
     
-    public Collection<Class> getFunctionalTests() {
-        Set<Class> allPluginTests = new HashSet<Class>();
-        for (PlayPlugin plugin : getEnabledPlugins()) {
-            Collection<Class> funcTests = plugin.getFunctionalTests();
-            if(funcTests != null) {
-                allPluginTests.addAll(funcTests);
-            }
-        }
-        
-        return allPluginTests;
-    }
+//    public Collection<Class> getFunctionalTests() {
+//        Set<Class> allPluginTests = new HashSet<Class>();
+//        for (PlayPlugin plugin : getEnabledPlugins()) {
+//            Collection<Class> funcTests = plugin.getFunctionalTests();
+//            if(funcTests != null) {
+//                allPluginTests.addAll(funcTests);
+//            }
+//        }
+//
+//        return allPluginTests;
+//    }
 }

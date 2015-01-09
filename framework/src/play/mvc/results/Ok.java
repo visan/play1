@@ -15,6 +15,6 @@ public class Ok extends Result {
     }
 
     public void apply(Request request, Response response) {
-        response.status = Http.StatusCode.OK;
+//        response.status = Http.StatusCode.OK;
     }
 }

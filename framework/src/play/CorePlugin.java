@@ -72,35 +72,35 @@ public class CorePlugin extends PlayPlugin {
      */
     @Override
     public boolean rawInvocation(Request request, Response response) throws Exception {
-        if (Play.mode == Mode.DEV && request.path.equals("/@kill")) {
-            System.out.println("@KILLED");
-            if (Play.standalonePlayServer) {
-                System.exit(0);
-            } else {
-                Logger.error("Cannot execute @kill since Play is not running as standalone server");
-            }
-        }
-        if (request.path.equals("/@status") || request.path.equals("/@status.json")) {
-            if(!Play.started) {
-                response.print("Application is not started");
-                response.status = 503;
-                return true;
-            }
-            response.contentType = request.path.contains(".json") ? "application/json" : "text/plain";
-            Header authorization = request.headers.get("authorization");
-            if (request.isLoopback || (authorization != null && Crypto.sign("@status").equals(authorization.value()))) {
-                response.print(computeApplicationStatus(request.path.contains(".json")));
-                response.status = 200;
-                return true;
-            }
-            response.status = 401;
-            if (response.contentType.equals("application/json")) {
-                response.print("{\"error\": \"Not authorized\"}");
-            } else {
-                response.print("Not authorized");
-            }
-            return true;
-        }
+//        if (Play.mode == Mode.DEV && request.path.equals("/@kill")) {
+//            System.out.println("@KILLED");
+//            if (Play.standalonePlayServer) {
+//                System.exit(0);
+//            } else {
+//                Logger.error("Cannot execute @kill since Play is not running as standalone server");
+//            }
+//        }
+//        if (request.path.equals("/@status") || request.path.equals("/@status.json")) {
+//            if(!Play.started) {
+//                response.print("Application is not started");
+//                response.status = 503;
+//                return true;
+//            }
+//            response.contentType = request.path.contains(".json") ? "application/json" : "text/plain";
+//            Header authorization = request.headers.get("authorization");
+//            if (request.isLoopback || (authorization != null && Crypto.sign("@status").equals(authorization.value()))) {
+//                response.print(computeApplicationStatus(request.path.contains(".json")));
+//                response.status = 200;
+//                return true;
+//            }
+//            response.status = 401;
+//            if (response.contentType.equals("application/json")) {
+//                response.print("{\"error\": \"Not authorized\"}");
+//            } else {
+//                response.print("Not authorized");
+//            }
+//            return true;
+//        }
         return super.rawInvocation(request, response);
     }
 

@@ -1,19 +1,5 @@
 package play;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.LineNumberReader;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import play.cache.Cache;
 import play.classloading.*;
 import play.deps.DependenciesManager;
@@ -21,11 +7,18 @@ import play.exceptions.PlayException;
 import play.exceptions.UnexpectedException;
 import play.libs.IO;
 import play.mvc.Http;
-import play.mvc.Router;
 import play.plugins.PluginCollection;
-import play.templates.TemplateLoader;
 import play.utils.OrderSafeProperties;
 import play.vfs.VirtualFile;
+
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Main framework class
@@ -536,8 +529,8 @@ public class Play {
                 langs = new ArrayList<String>(16);
             }
 
-            // Clean templates
-            TemplateLoader.cleanCompiledCache();
+//            // Clean templates
+//            TemplateLoader.cleanCompiledCache();
 
             // SecretKey
             secretKey = configuration.getProperty("application.secret", "").trim();
@@ -554,7 +547,7 @@ public class Play {
                 // this configuration-loading in dev-mode have already been
                 // set up with the previous encoding
                 if (Http.Response.current() != null) {
-                    Http.Response.current().encoding = _defaultWebEncoding;
+//                    Http.Response.current().encoding = _defaultWebEncoding;
                 }
             }
 
@@ -562,8 +555,8 @@ public class Play {
             // Try to load all classes
             Play.classloader.getAllClasses();
 
-            // Routes
-            Router.detectChanges(ctxPath);
+//            // Routes
+//            Router.detectChanges(ctxPath);
 
             // Cache
             Cache.init();
@@ -619,7 +612,7 @@ public class Play {
             pluginCollection.onApplicationStop();
             started = false;
             Cache.stop();
-            Router.lastLoading = 0L;
+//            Router.lastLoading = 0L;
         }
     }
 
@@ -651,7 +644,7 @@ public class Play {
 
             if (!lazyLoadTemplates) {
                 start = System.currentTimeMillis();
-                TemplateLoader.getAllTemplate();
+//                TemplateLoader.getAllTemplate();
 
                 if (Logger.isTraceEnabled()) {
                     Logger.trace("%sms to precompile the templates", System.currentTimeMillis() - start);
@@ -677,7 +670,7 @@ public class Play {
             if (!pluginCollection.detectClassesChange()) {
                 classloader.detectChanges();
             }
-            Router.detectChanges(ctxPath);
+//            Router.detectChanges(ctxPath);
             for (VirtualFile conf : confs) {
                 if (conf.lastModified() > startedAt) {
                     start();

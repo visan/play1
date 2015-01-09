@@ -21,7 +21,7 @@ import play.Logger;
 import play.Play;
 import play.PlayPlugin;
 import play.libs.F.Promise;
-import play.libs.OAuth.ServiceInfo;
+//import play.libs.OAuth.ServiceInfo;
 import play.libs.ws.WSAsync;
 import play.libs.ws.WSUrlFetch;
 import play.mvc.Http;
@@ -232,7 +232,7 @@ public class WS extends PlayPlugin {
          */
         public Integer timeout = 60;
 
-        public ServiceInfo oauthInfo = null;
+//        public ServiceInfo oauthInfo = null;
         public String oauthToken = null;
         public String oauthSecret = null;
 
@@ -281,21 +281,21 @@ public class WS extends PlayPlugin {
             return authenticate(username, password, Scheme.BASIC);
         }
 
-        /**
-         * Sign the request for do a call to a server protected by oauth
-         * @return the WSRequest for chaining.
-         */
-        public WSRequest oauth(ServiceInfo oauthInfo, String token, String secret) {
-            this.oauthInfo = oauthInfo;
-            this.oauthToken = token;
-            this.oauthSecret = secret;
-            return this;
-        }
-
-        @Deprecated
-        public WSRequest oauth(ServiceInfo oauthInfo, OAuth.TokenPair oauthTokens) {
-            return this.oauth(oauthInfo, oauthTokens.token, oauthTokens.secret);
-        }
+//        /**
+//         * Sign the request for do a call to a server protected by oauth
+//         * @return the WSRequest for chaining.
+//         */
+//        public WSRequest oauth(ServiceInfo oauthInfo, String token, String secret) {
+//            this.oauthInfo = oauthInfo;
+//            this.oauthToken = token;
+//            this.oauthSecret = secret;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public WSRequest oauth(ServiceInfo oauthInfo, OAuth.TokenPair oauthTokens) {
+//            return this.oauth(oauthInfo, oauthTokens.token, oauthTokens.secret);
+//        }
 
         /**
          * Indicate if the WS should continue when hitting a 301 or 302

@@ -1,15 +1,10 @@
 package play.utils;
 
 import play.Play;
-import play.mvc.Scope;
 
 import java.lang.annotation.Annotation;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -134,9 +129,9 @@ public class Utils {
         return newMap;
     }
 
-    public static Map<String, String> filterParams(Scope.Params params, String prefix) {
-        return filterParams(params.all(), prefix);
-    }
+//    public static Map<String, String> filterParams(Scope.Params params, String prefix) {
+//        return filterParams(params.all(), prefix);
+//    }
 
     public static Map<String, String> filterParams(Map<String, String[]> params, String prefix, String separator) {
         Map<String, String> filteredMap = new LinkedHashMap<String, String>();

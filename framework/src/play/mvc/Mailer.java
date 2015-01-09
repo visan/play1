@@ -22,12 +22,12 @@ import play.Logger;
 import play.Play;
 import play.classloading.enhancers.LVEnhancer.LVEnhancerRuntime;
 import play.exceptions.MailException;
-import play.exceptions.TemplateNotFoundException;
+//import play.exceptions.TemplateNotFoundException;
 import play.exceptions.UnexpectedException;
 import play.libs.Mail;
 import play.libs.MimeTypes;
-import play.templates.Template;
-import play.templates.TemplateLoader;
+//import play.templates.Template;
+//import play.templates.TemplateLoader;
 import play.vfs.VirtualFile;
 
 import javax.activation.DataSource;
@@ -411,23 +411,23 @@ public class Mailer {
             String contentType = (String) infos.get().get("contentType");
             String bodyHtml = null;
             String bodyText = "";
-            try {
-                Template templateHtml = TemplateLoader.load(templateName + ".html");
-                bodyHtml = templateHtml.render(templateHtmlBinding);
-            } catch (TemplateNotFoundException e) {
-                if (contentType != null && !contentType.startsWith("text/plain")) {
-                    throw e;
-                }
-            }
-
-            try {
-                Template templateText = TemplateLoader.load(templateName + ".txt");
-                bodyText = templateText.render(templateTextBinding);
-            } catch (TemplateNotFoundException e) {
-                if (bodyHtml == null && (contentType == null || contentType.startsWith("text/plain"))) {
-                    throw e;
-                }
-            }
+//            try {
+//                Template templateHtml = TemplateLoader.load(templateName + ".html");
+//                bodyHtml = templateHtml.render(templateHtmlBinding);
+//            } catch (TemplateNotFoundException e) {
+//                if (contentType != null && !contentType.startsWith("text/plain")) {
+//                    throw e;
+//                }
+//            }
+//
+//            try {
+//                Template templateText = TemplateLoader.load(templateName + ".txt");
+//                bodyText = templateText.render(templateTextBinding);
+//            } catch (TemplateNotFoundException e) {
+//                if (bodyHtml == null && (contentType == null || contentType.startsWith("text/plain"))) {
+//                    throw e;
+//                }
+//            }
 
             // Content type
 

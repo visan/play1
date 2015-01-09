@@ -20,9 +20,9 @@ public class NotModified extends Result {
     }
 
     public void apply(Request request, Response response) {
-        response.status = Http.StatusCode.NOT_MODIFIED;
-        if (etag != null) {
-            response.setHeader("Etag", etag);
-        }
+//        response.status = Http.StatusCode.NOT_MODIFIED;
+//        if (etag != null) {
+//            response.setHeader("Etag", etag);
+//        }
     }
 }

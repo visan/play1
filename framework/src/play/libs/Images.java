@@ -317,7 +317,7 @@ public class Images {
                     ImageIO.write(bi, "png", baos);
                     bais = new ByteArrayInputStream(baos.toByteArray());
                     //
-                    Response.current().contentType = "image/png";
+//                    Response.current().contentType = "image/png";
                 }
             } catch (Exception e) {
                 throw new UnexpectedException(e);
