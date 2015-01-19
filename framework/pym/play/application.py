@@ -102,18 +102,18 @@ class PlayApplication(object):
                     modules.append(mf)
                 else:
                     modules.append(open(mf, 'r').read().strip())
-        stModulesEnv = os.environ.get('MODULES')
-        arModulesPaths = stModulesEnv.split(";")
-        for stModulePath in arModulesPaths:
-            print(stModulePath)
-            mf = os.path.normpath(stModulePath)
-            if os.path.exists(mf):
-                modules.append(mf)
-                print "Module %s found. Adding..." % mf
-            else:
-                print "Module %s not found. skipping..." % mf
-                # os_path_separator()
-
+        if os.environ.has_key('MODULES'):
+            stModulesEnv = os.environ.get('MODULES')
+            arModulesPaths = stModulesEnv.split(";")
+            for stModulePath in arModulesPaths:
+                print(stModulePath)
+                mf = os.path.normpath(stModulePath)
+                if os.path.exists(mf):
+                    modules.append(mf)
+                    print "Module %s found. Adding..." % mf
+                else:
+                    print "Module %s not found. skipping..." % mf
+                    # os_path_separator()
         # if isTestFrameworkId( self.play_env["id"] ):
         #     modules.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'modules/testrunner')))
         return set(modules) # Ensure we don't have duplicates
