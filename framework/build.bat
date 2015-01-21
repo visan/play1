@@ -1,4 +1,5 @@
 rem call setenv.cmd
+set PATH=%PATH%;C:\prog\Git\bin
 
 set ANT_HOME=F:\java\apache-ant-1.9.4
 rem set JAVA_HOME=F:\java\jdk6-45-b64
