@@ -1,7 +1,6 @@
 package play.db;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.ConnectionCustomizer;
+import com.mchange.v2.c3p0.*;
 import com.sun.rowset.CachedRowSetImpl;
 
 import jregex.Matcher;
@@ -308,8 +307,8 @@ public class DBConfig {
                         }
                     }
 
-                    ComboPooledDataSource ds = new ComboPooledDataSource();
-                    ds.setDriverClass(p.getProperty(propsPrefix+".driver"));
+                    ComboPooledDataSource ds = new ComboPooledDataSource(false);
+                    ds.setDriverClass(p.getProperty(propsPrefix + ".driver"));
                     ds.setJdbcUrl(p.getProperty(propsPrefix + ".url"));
                     ds.setUser(p.getProperty(propsPrefix + ".user"));
                     ds.setPassword(p.getProperty(propsPrefix + ".pass"));
@@ -321,6 +320,9 @@ public class DBConfig {
                     ds.setMaxIdleTimeExcessConnections(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxIdleTimeExcessConnections", "0")));
                     ds.setIdleConnectionTestPeriod(10);
                     ds.setTestConnectionOnCheckin(true);
+                    ds.setIdentityToken(propsPrefix);
+//                    ds.setDataSourceName(propsPrefix);
+                    C3P0Registry.reregister(ds);
 
                     if (p.getProperty(propsPrefix+".testquery") != null) {
 			    ds.setPreferredTestQuery(p.getProperty(propsPrefix+".testquery"));
