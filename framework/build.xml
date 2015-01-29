@@ -4,6 +4,7 @@
 
     <property name="version" value="visan" />
     <property name="baseversion" value="master" />
+    <property name="version" value="visan-soa" />
 
     <path id="project.classpath">
         <fileset dir=".">
