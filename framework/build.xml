@@ -3,6 +3,7 @@
 <project name="play! framework" default="jar" basedir=".">
 
     <property name="baseversion" value="master" />
+    <property name="version" value="visan-soa" />
 
     <path id="project.classpath">
         <fileset dir=".">

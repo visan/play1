@@ -56,11 +56,12 @@ public class ActionInvoker {
         try {
             Method actionMethod = null;
 //            Object[] ca = getActionMethod(request.action);
-//            actionMethod = (Method) ca[1];
-//            request.controller = ((Class) ca[0]).getName().substring(12).replace("$", "");
-//            request.controllerClass = ((Class) ca[0]);
-//            request.actionMethod = actionMethod.getName();
-//            request.action = request.controller + "." + request.actionMethod;
+            Object[] ca = getActionMethod("Application.index");
+            actionMethod = (Method) ca[1];
+            request.controller = ((Class) ca[0]).getName().substring(12).replace("$", "");
+            request.controllerClass = ((Class) ca[0]);
+            request.actionMethod = actionMethod.getName();
+            request.action = request.controller + "." + request.actionMethod;
             request.invokedMethod = actionMethod;
 
             if (Logger.isTraceEnabled()) {

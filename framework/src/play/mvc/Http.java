@@ -207,6 +207,8 @@ public class Http {
          * New request or already submitted
          */
         public boolean isNew = true;
+        public String controller;
+        public String actionMethod;
 
 
         /**
