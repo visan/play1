@@ -549,10 +549,10 @@ public class ActionInvoker {
 
 
     public static Object[] getActionMethodArgs(Method method, Object o) throws Exception {
-        String[] paramsNames = Java.parameterNames(method);
-        if (paramsNames == null && method.getParameterTypes().length > 0) {
-            throw new UnexpectedException("Parameter names not found for method " + method);
-        }
+//        String[] paramsNames = Java.parameterNames(method);
+//        if (paramsNames == null && method.getParameterTypes().length > 0) {
+//            throw new UnexpectedException("Parameter names not found for method " + method);
+//        }
 
 
         // Check if we have already performed the bind operation

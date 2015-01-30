@@ -20,7 +20,7 @@ import org.apache.commons.mail.*;
 
 import play.Logger;
 import play.Play;
-import play.classloading.enhancers.LVEnhancer.LVEnhancerRuntime;
+
 import play.exceptions.MailException;
 //import play.exceptions.TemplateNotFoundException;
 import play.exceptions.UnexpectedException;
@@ -388,7 +388,7 @@ public class Mailer {
             templateName = templateName.substring(0, templateName.indexOf("("));
             templateName = templateName.replace(".", "/");
 
-            String[] names = LVEnhancerRuntime.getParamNames().mergeParamsAndVarargs();
+            String[] names =null;// LVEnhancerRuntime.getParamNames().mergeParamsAndVarargs();
             
             // overrides Template name
             if (args.length > 0 && args[0] instanceof String && names[0] == null) {

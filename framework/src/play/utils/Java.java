@@ -192,46 +192,46 @@ public class Java {
         return Java.invokeStaticOrParent(invokedClass, method, args);
     }
 
-    public static Object invokeStatic(Method method, Map<String, String[]> args) throws Exception {
-        return method.invoke(null, prepareArgs(method, args));
-    }
+//    public static Object invokeStatic(Method method, Map<String, String[]> args) throws Exception {
+//        return method.invoke(null, prepareArgs(method, args));
+//    }
 
     public static Object invokeStatic(Method method, Object[] args) throws Exception {
         return method.invoke(null, args);
     }
 
-    static Object[] prepareArgs(Method method, Map<String, String[]> args) throws Exception {
-        String[] paramsNames = parameterNames(method);
-        if (paramsNames == null && method.getParameterTypes().length > 0) {
-            throw new UnexpectedException("Parameter names not found for method " + method);
-        }
-
-//        RootParamNode rootParamNode = ParamNode.convert(args);
-
-        Object[] rArgs = new Object[method.getParameterTypes().length];
-//        for (int i = 0; i < method.getParameterTypes().length; i++) {
-//            rArgs[i] = Binder.bind(rootParamNode, paramsNames[i], method.getParameterTypes()[i], method.getGenericParameterTypes()[i], method.getParameterAnnotations()[i]);
+//    static Object[] prepareArgs(Method method, Map<String, String[]> args) throws Exception {
+//        String[] paramsNames = parameterNames(method);
+//        if (paramsNames == null && method.getParameterTypes().length > 0) {
+//            throw new UnexpectedException("Parameter names not found for method " + method);
 //        }
-        return rArgs;
-    }
+//
+////        RootParamNode rootParamNode = ParamNode.convert(args);
+//
+//        Object[] rArgs = new Object[method.getParameterTypes().length];
+////        for (int i = 0; i < method.getParameterTypes().length; i++) {
+////            rArgs[i] = Binder.bind(rootParamNode, paramsNames[i], method.getParameterTypes()[i], method.getGenericParameterTypes()[i], method.getParameterAnnotations()[i]);
+////        }
+//        return rArgs;
+//    }
 
     /**
      * Retrieve parameter names of a method
      */
-    public static String[] parameterNames(Method method) throws Exception {
-        try {
-            /*System.out.println("searching for " + "$" + method.getName() + LVEnhancer.computeMethodHash(method.getParameterTypes()));
-            for(Field f : method.getDeclaringClass().getDeclaredFields()) {
-                System.out.println(f.getName() + " : " + Modifier.toString(f.getModifiers()));
-            }
-            for(Field f : method.getDeclaringClass().getFields()) {
-                System.out.println(f.getName() + " : " + Modifier.toString(f.getModifiers()));
-            }*/
-            return (String[]) method.getDeclaringClass().getDeclaredField("$" + method.getName() + LVEnhancer.computeMethodHash(method.getParameterTypes())).get(null);
-        } catch (Exception e) {
-            throw new UnexpectedException("Cannot read parameter names for " + method, e);
-        }
-    }
+//    public static String[] parameterNames(Method method) throws Exception {
+//        try {
+//            /*System.out.println("searching for " + "$" + method.getName() + LVEnhancer.computeMethodHash(method.getParameterTypes()));
+//            for(Field f : method.getDeclaringClass().getDeclaredFields()) {
+//                System.out.println(f.getName() + " : " + Modifier.toString(f.getModifiers()));
+//            }
+//            for(Field f : method.getDeclaringClass().getFields()) {
+//                System.out.println(f.getName() + " : " + Modifier.toString(f.getModifiers()));
+//            }*/
+//            return (String[]) method.getDeclaringClass().getDeclaredField("$" + method.getName() + LVEnhancer.computeMethodHash(method.getParameterTypes())).get(null);
+//        } catch (Exception e) {
+//            throw new UnexpectedException("Cannot read parameter names for " + method, e);
+//        }
+//    }
 
     public static String rawMethodSignature(Method method) {
         StringBuilder sig = new StringBuilder();
