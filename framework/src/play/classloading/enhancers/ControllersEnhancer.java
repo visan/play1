@@ -178,58 +178,58 @@ public class ControllersEnhancer extends Enhancer {
         return false;
     }
 
-    /**
-     * Runtime part needed by the instrumentation
-     */
-    public static class ControllerInstrumentation {
-
-        public static boolean isActionCallAllowed() {
-            return allow.get();
-        }
-
-        public static void initActionCall() {
-            allow.set(true);
-        }
-
-        public static void stopActionCall() {
-            allow.set(false);
-        }
-        static ThreadLocal<Boolean> allow = new ThreadLocal<Boolean>();
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface ByPass {
-    }
-
-    static String generateValidReturnStatement(CtClass type) {
-        if (type.equals(CtClass.voidType)) {
-            return "return;";
-        }
-        if (type.equals(CtClass.booleanType)) {
-            return "return false;";
-        }
-        if (type.equals(CtClass.charType)) {
-            return "return '';";
-        }
-        if (type.equals(CtClass.byteType)) {
-            return "return (byte)0;";
-        }
-        if (type.equals(CtClass.doubleType)) {
-            return "return (double)0;";
-        }
-        if (type.equals(CtClass.floatType)) {
-            return "return (float)0;";
-        }
-        if (type.equals(CtClass.intType)) {
-            return "return (int)0;";
-        }
-        if (type.equals(CtClass.longType)) {
-            return "return (long)0;";
-        }
-        if (type.equals(CtClass.shortType)) {
-            return "return (short)0;";
-        }
-        return "return null;";
-    }
+//    /**
+//     * Runtime part needed by the instrumentation
+//     */
+//    public static class ControllerInstrumentation {
+//
+//        public static boolean isActionCallAllowed() {
+//            return allow.get();
+//        }
+//
+//        public static void initActionCall() {
+//            allow.set(true);
+//        }
+//
+//        public static void stopActionCall() {
+//            allow.set(false);
+//        }
+//        static ThreadLocal<Boolean> allow = new ThreadLocal<Boolean>();
+//    }
+//
+//    @Retention(RetentionPolicy.RUNTIME)
+//    @Target(ElementType.METHOD)
+//    public @interface ByPass {
+//    }
+//
+//    static String generateValidReturnStatement(CtClass type) {
+//        if (type.equals(CtClass.voidType)) {
+//            return "return;";
+//        }
+//        if (type.equals(CtClass.booleanType)) {
+//            return "return false;";
+//        }
+//        if (type.equals(CtClass.charType)) {
+//            return "return '';";
+//        }
+//        if (type.equals(CtClass.byteType)) {
+//            return "return (byte)0;";
+//        }
+//        if (type.equals(CtClass.doubleType)) {
+//            return "return (double)0;";
+//        }
+//        if (type.equals(CtClass.floatType)) {
+//            return "return (float)0;";
+//        }
+//        if (type.equals(CtClass.intType)) {
+//            return "return (int)0;";
+//        }
+//        if (type.equals(CtClass.longType)) {
+//            return "return (long)0;";
+//        }
+//        if (type.equals(CtClass.shortType)) {
+//            return "return (short)0;";
+//        }
+//        return "return null;";
+//    }
 }

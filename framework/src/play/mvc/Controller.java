@@ -19,7 +19,7 @@ import play.Play;
 import play.classloading.ApplicationClasses;
 import play.classloading.ApplicationClasses.ApplicationClass;
 import play.classloading.enhancers.ContinuationEnhancer;
-import play.classloading.enhancers.ControllersEnhancer.ControllerInstrumentation;
+//import play.classloading.enhancers.ControllersEnhancer.ControllerInstrumentation;
 import play.classloading.enhancers.ControllersEnhancer.ControllerSupport;
 import play.exceptions.*;
 import play.libs.Time;
@@ -263,7 +263,7 @@ public class Controller implements ControllerSupport {
             future = (Future<T>)Request.current().args.get(ActionInvoker.F);
 
             // Now reset the Controller invocation context
-            ControllerInstrumentation.stopActionCall();
+//            ControllerInstrumentation.stopActionCall();
             storeOrRestoreDataStateForContinuations( true );
         } else {
             throw new UnexpectedException("Lost promise for " + Http.Request.current() + "!");
