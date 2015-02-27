@@ -2,6 +2,7 @@
 
 <project name="play! framework" default="jar" basedir=".">
 
+    <property name="version" value="visan" />
     <property name="baseversion" value="master" />
 
     <path id="project.classpath">
