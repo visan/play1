@@ -328,6 +328,8 @@ public class DBConfig {
                   ds.setUnreturnedConnectionTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.unreturnedConnectionTimeout", "0")));//unreturnedConnectionTimeout
                   ds.setDebugUnreturnedConnectionStackTraces(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.debugUnreturnedConnectionStackTraces", "false")));//debugUnreturnedConnectionStackTraces
                   ds.setTestConnectionOnCheckout(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.testConnectionOnCheckout", "false")));//testConnectionOnCheckout
+                  ds.setMaxStatements(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxStatements", "0")));//maxStatements
+                  ds.setMaxStatementsPerConnection(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxStatementsPerConnection", "0")));//maxStatementsPerConnection
 
 /*
 
@@ -344,8 +346,8 @@ initialPoolSize
 maxAdministrativeTaskTime
 maxConnectionAge
 maxIdleTime
-maxStatements
-maxStatementsPerConnection
+
+
 numHelperThreads
 overrideDefaultUser
 overrideDefaultPassword
