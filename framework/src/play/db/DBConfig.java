@@ -308,20 +308,58 @@ public class DBConfig {
                     }
 
                     ComboPooledDataSource ds = new ComboPooledDataSource(false);
-                    ds.setDriverClass(p.getProperty(propsPrefix + ".driver"));
-                    ds.setJdbcUrl(p.getProperty(propsPrefix + ".url"));
-                    ds.setUser(p.getProperty(propsPrefix + ".user"));
-                    ds.setPassword(p.getProperty(propsPrefix + ".pass"));
-                    ds.setAcquireRetryAttempts(10);
-                    ds.setCheckoutTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.timeout", "5000")));
-                    ds.setBreakAfterAcquireFailure(false);
-                    ds.setMaxPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxSize", "30")));
-                    ds.setMinPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.minSize", "1")));
-                    ds.setMaxIdleTimeExcessConnections(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxIdleTimeExcessConnections", "0")));
-                    ds.setIdleConnectionTestPeriod(10);
-                    ds.setTestConnectionOnCheckin(true);
-                    ds.setIdentityToken(propsPrefix);
-//                    ds.setDataSourceName(propsPrefix);
+                    ds.setDriverClass(p.getProperty(propsPrefix + ".driver"));//driverClass
+                    ds.setJdbcUrl(p.getProperty(propsPrefix + ".url"));//jdbcUrl
+                    ds.setUser(p.getProperty(propsPrefix + ".user"));//user
+                    ds.setPassword(p.getProperty(propsPrefix + ".pass"));//password
+                    ds.setAcquireIncrement(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireIncrement", "3")));//acquireIncrement
+                    ds.setAcquireRetryAttempts(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryAttempts", "10")));//acquireRetryAttempts
+                    ds.setAcquireRetryDelay(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryDelay", "1000")));//acquireRetryDelay
+
+                    ds.setCheckoutTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.timeout", "5000")));//checkoutTimeout
+                    ds.setBreakAfterAcquireFailure(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.breakAfterAcquireFailure", "false")));//breakAfterAcquireFailure
+                    ds.setMaxPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxSize", "30")));//maxPoolSize
+                    ds.setMinPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.minSize", "1")));//minPoolSize
+                    ds.setMaxIdleTimeExcessConnections(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxIdleTimeExcessConnections", "0")));//maxIdleTimeExcessConnections
+                    ds.setIdleConnectionTestPeriod(Integer.parseInt(p.getProperty(propsPrefix + ".pool.idleConnectionTestPeriod", "0")));//idleConnectionTestPeriod
+                    ds.setTestConnectionOnCheckin(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.testConnectionOnCheckin", "true")));//testConnectionOnCheckin
+                  ds.setAutoCommitOnClose(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.autoCommitOnClose", "false")));//autoCommitOnClose
+                  ds.setPreferredTestQuery(p.getProperty(propsPrefix + ".pool.preferredTestQuery", null));//preferredTestQuery
+                  ds.setUnreturnedConnectionTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.unreturnedConnectionTimeout", "0")));//unreturnedConnectionTimeout
+                  ds.setDebugUnreturnedConnectionStackTraces(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.debugUnreturnedConnectionStackTraces", "false")));//debugUnreturnedConnectionStackTraces
+                  ds.setTestConnectionOnCheckout(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.testConnectionOnCheckout", "false")));//testConnectionOnCheckout
+
+/*
+
+automaticTestTable
+connectionCustomizerClassName
+connectionTesterClassName
+contextClassLoaderSource
+
+extensions
+factoryClassLocation
+forceIgnoreUnresolvedTransactions
+forceUseNamedDriverClass
+initialPoolSize
+maxAdministrativeTaskTime
+maxConnectionAge
+maxIdleTime
+maxStatements
+maxStatementsPerConnection
+numHelperThreads
+overrideDefaultUser
+overrideDefaultPassword
+
+privilegeSpawnedThreads
+propertyCycle
+statementCacheNumDeferredCloseThreads
+
+
+usesTraditionalReflectiveProxies
+
+ */
+                  ds.setIdentityToken(propsPrefix);
+//                    ds.setDataSourceName(propsPrefix);//dataSourceName
                     C3P0Registry.reregister(ds);
 
                     if (p.getProperty(propsPrefix+".testquery") != null) {
