@@ -176,6 +176,19 @@ class PlayApplication(object):
         if os.path.exists(os.path.join(self.path, 'classes')):
             classpath.append(os.path.normpath(os.path.join(self.path, 'classes/.')))
 
+        if os.environ.has_key('PCP'):
+            stClassPathsEnv = os.environ.get('PCP')
+            arClassPaths = stClassPathsEnv.split(";")
+            for stClassPath in arClassPaths:
+                print(stClassPath)
+                mf = os.path.normpath(stClassPath)
+                if os.path.exists(mf):
+                    classpath.append(os.path.join(mf, '/.'))
+                    print "Play class path %s found. Adding..." % mf
+                else:
+                    print "Play class path %s not found. skipping..." % mf
+                    # os_path_separator()
+
         # The modules
         for module in self.modules():
             if os.path.exists(os.path.join(module, 'lib')):
