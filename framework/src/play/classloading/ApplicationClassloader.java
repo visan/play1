@@ -89,6 +89,7 @@ public class ApplicationClassloader extends ClassLoader {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~
     public Class<?> loadApplicationClass(String name) {
+      System.out.println("loadApplicationClass: "+name);
 
         if (ApplicationClass.isClass(name)) {
             Class maybeAlreadyLoaded = findLoadedClass(name);
@@ -203,7 +204,9 @@ public class ApplicationClassloader extends ClassLoader {
      * Search for the byte code of the given class.
      */
     protected byte[] getClassDefinition(String name) {
-        name = name.replace(".", "/") + ".class";
+      System.out.println("getClassDefinition: "+name);
+
+      name = name.replace(".", "/") + ".class";
         InputStream is = this.getResourceAsStream(name);
         if (is == null) {
             return null;

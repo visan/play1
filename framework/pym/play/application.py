@@ -106,7 +106,7 @@ class PlayApplication(object):
             stModulesEnv = os.environ.get('MODULES')
             arModulesPaths = stModulesEnv.split(";")
             for stModulePath in arModulesPaths:
-                print(stModulePath)
+                #print(stModulePath)
                 mf = os.path.normpath(stModulePath)
                 if os.path.exists(mf):
                     modules.append(mf)
@@ -180,10 +180,11 @@ class PlayApplication(object):
             stClassPathsEnv = os.environ.get('PCP')
             arClassPaths = stClassPathsEnv.split(";")
             for stClassPath in arClassPaths:
-                print(stClassPath)
+                #print(stClassPath)
+                #mf = os.path.normpath(os.path.join(stClassPath, '/.'))
                 mf = os.path.normpath(stClassPath)
                 if os.path.exists(mf):
-                    classpath.append(os.path.join(mf, '/.'))
+                    classpath.append(mf)
                     print "Play class path %s found. Adding..." % mf
                 else:
                     print "Play class path %s not found. skipping..." % mf
@@ -352,6 +353,7 @@ class PlayApplication(object):
             java_args.append('-Dplay.debug=yes')
         
         java_cmd = [self.java_path(), '-javaagent:%s' % self.agent_path()] + java_args + ['-classpath', cp_args, '-Dapplication.path=%s' % self.path, '-Dplay.id=%s' % self.play_env["id"], className] + args
+        print "java_cmd: %s" % java_cmd
         return java_cmd
 
     # ~~~~~~~~~~~~~~~~~~~~~~ MISC
