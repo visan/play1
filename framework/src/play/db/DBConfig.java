@@ -386,14 +386,15 @@ usesTraditionalReflectiveProxies
 
                     datasource = ds;
                     url = ds.getJdbcUrl();
-                    Connection c = null;
-                    try {
-                        c = ds.getConnection();
-                    } finally {
-                        if (c != null) {
-                            c.close();
-                        }
-                    }
+                  //commended in order to decrease aquire timeout to 1 millsec.
+//                    Connection c = null;
+//                    try {
+//                        c = ds.getConnection();
+//                    } finally {
+//                        if (c != null) {
+//                            c.close();
+//                        }
+//                    }
                     Logger.info("Connected to %s", ds.getJdbcUrl());
 
                 }
