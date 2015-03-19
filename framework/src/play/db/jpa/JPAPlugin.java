@@ -2,7 +2,7 @@ package play.db.jpa;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Level;
+//import org.apache.log4j.Level;
 import org.hibernate.CallbackException;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.collection.spi.PersistentCollection;
@@ -181,14 +181,14 @@ public class JPAPlugin extends PlayPlugin {
 
                 cfg.setInterceptor(new PlayInterceptor());
 
-                // This setting is global for all JPAs - only configure if configuring default JPA
-                if (StringUtils.isEmpty(propPrefix)) {
-                    if (Play.configuration.getProperty(propPrefix + "jpa.debugSQL", "false").equals("true")) {
-                        org.apache.log4j.Logger.getLogger("org.hibernate.SQL").setLevel(Level.ALL);
-                    } else {
-                        org.apache.log4j.Logger.getLogger("org.hibernate.SQL").setLevel(Level.OFF);
-                    }
-                }
+//                // This setting is global for all JPAs - only configure if configuring default JPA
+//                if (StringUtils.isEmpty(propPrefix)) {
+//                    if (Play.configuration.getProperty(propPrefix + "jpa.debugSQL", "false").equals("true")) {
+//                        org.apache.log4j.Logger.getLogger("org.hibernate.SQL").setLevel(Level.ALL);
+//                    } else {
+//                        org.apache.log4j.Logger.getLogger("org.hibernate.SQL").setLevel(Level.OFF);
+//                    }
+//                }
                 // inject additional  hibernate.* settings declared in Play! configuration
                 Properties additionalProperties = (Properties) Utils.Maps.filterMap(Play.configuration, "^" + propPrefix + "hibernate\\..*");
                 // We must remove prefix from names
