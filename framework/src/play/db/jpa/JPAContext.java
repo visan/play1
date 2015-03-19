@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.PersistenceException;
 
+import play.Logger;
 import play.exceptions.JPAException;
 
 /**
@@ -14,6 +15,7 @@ public class JPAContext {
     private JPAConfig jpaConfig;
     private EntityManager entityManager;
     private boolean readonly = true;
+  private long startTs;
 
     protected JPAContext(JPAConfig jpaConfig, boolean readonly, boolean beginTransaction) {
 
@@ -25,6 +27,8 @@ public class JPAContext {
 
         if (beginTransaction) {
             manager.getTransaction().begin();
+          startTs = System.currentTimeMillis();
+          Logger.trace("JPAContext.closeTx: tx[%s] begined. (%s)",jpaConfig.getConfigName(),readonly?"ro":"rw");
         }
 
         entityManager = manager;
@@ -40,14 +44,16 @@ public class JPAContext {
      * @param rollback shall current transaction be committed (false) or cancelled (true)
      */
     public void closeTx(boolean rollback) {
-
+      long duration=System.currentTimeMillis()-startTs;
         try {
             if (entityManager.getTransaction().isActive()) {
                 if (readonly || rollback || entityManager.getTransaction().getRollbackOnly()) {
                     entityManager.getTransaction().rollback();
+                  Logger.trace("JPAContext.closeTx: tx[%s] rollbacked.(Took %s ms.)======",jpaConfig.getConfigName(),duration);
                 } else {
                     try {
                         entityManager.getTransaction().commit();
+                      Logger.trace("JPAContext.closeTx: tx[%s] commited.(Took %s ms.)",jpaConfig.getConfigName(),duration);
                     } catch (Throwable e) {
                         for (int i = 0; i < 10; i++) {
                             if (e instanceof PersistenceException && e.getCause() != null) {
@@ -59,9 +65,11 @@ public class JPAContext {
                                 break;
                             }
                         }
-                        throw new JPAException("Cannot commit", e);
+                        throw new JPAException("Cannot commit.(Took "+duration+" ms.)", e);
                     }
                 }
+            }else {
+              Logger.trace("JPAContext.closeTx: tx[%s] is NOT active. Nothing to commit.(Took %s ms.)",jpaConfig.getConfigName(),duration);
             }
         } finally {
             entityManager.close();

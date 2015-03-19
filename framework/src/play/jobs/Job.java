@@ -168,6 +168,11 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
     }
 
     public V call() {
+      String jobName=this.getClass().getName();
+      if (Logger.isTraceEnabled()) {
+        Logger.trace(String.format("job.%s: begin",jobName));
+      }
+      long startTs=System.currentTimeMillis();
         Monitor monitor = null;
         try {
             if (init()) {
@@ -201,8 +206,14 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
                 monitor.stop();
             }
             _finally();
+          long duration=System.currentTimeMillis()-startTs;
+          if (Logger.isTraceEnabled()) {
+            Logger.trace(String.format("job.%s: end (Took: %s ms.)",jobName, duration));
+          }
         }
-        return null;
+
+
+      return null;
     }
 
     @Override
