@@ -1,6 +1,7 @@
 package play;
 
 import java.lang.annotation.Annotation;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -166,7 +167,17 @@ public class Invoker {
      * An Invocation in something to run in a Play! context
      */
     public static abstract class Invocation implements Runnable {
+        private final String invokationId;
 
+        public static final String IVK = "IVK";
+
+        public Invocation() {
+            this.invokationId = new BigInteger(this.hashCode()+"").toString(Character.MAX_RADIX);
+        }
+
+        public String getInvocationId() {
+            return invokationId;
+        }
         /**
          * If set, monitor the time the invocation waited in the queue
          */
