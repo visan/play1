@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import play.Invoker;
@@ -172,6 +173,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
     }
 
     public V call() {
+      MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
       String jobName=this.getClass().getName();
 //      if (Logger.isTraceEnabled()) {
 //        Logger.trace(String.format("job.%s: begin",jobName));
@@ -219,6 +221,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
 //          }
           log.trace("end: {} (Took: {} ms.)", jobName,duration);
 //            log.trace(JOB_BOUNDARY,"end: {} (Took: {} ms.)", jobName,duration);
+          MDC.remove(Invoker.Invocation.IVK);
         }
 
 
