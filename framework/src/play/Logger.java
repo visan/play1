@@ -17,6 +17,11 @@ import java.util.Properties;
 //import org.apache.log4j.PropertyConfigurator;
 //import org.apache.log4j.xml.DOMConfigurator;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import org.slf4j.LoggerFactory;
 import play.exceptions.PlayException;
 
@@ -50,11 +55,12 @@ public class Logger {
      * true if logger is configured manually (log4j-config file supplied by application)
      */
     public static boolean configuredManually = false;
-    public static org.slf4j.Logger log4j = LoggerFactory.getLogger("play");
+    private static org.slf4j.Logger log4j = LoggerFactory.getLogger("play");
     /**
      * Try to init stuff.
      */
     public static void init() {
+
 //        String log4jPath = Play.configuration.getProperty("application.log.path", "/log4j.xml");
 //        URL log4jConf = Logger.class.getResource(log4jPath);
 //        boolean isXMLConfig = log4jPath.endsWith(".xml");
