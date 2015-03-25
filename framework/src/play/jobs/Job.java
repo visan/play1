@@ -5,6 +5,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import play.Invoker;
 import play.Invoker.InvocationContext;
 import play.Logger;
@@ -24,7 +28,8 @@ import com.jamonapi.MonitorFactory;
  * @param <V> The job result type (if any)
  */
 public class Job<V> extends Invoker.Invocation implements Callable<V> {
-
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Job.class.getName());
+    private static final Marker JOB_BOUNDARY= MarkerFactory.getMarker("JOB_BOUNDARY");
     public static final String invocationType = "Job";
 
     protected ExecutorService executor;
@@ -168,6 +173,15 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
     }
 
     public V call() {
+      MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
+      String jobName=this.getClass().getName();
+//      if (Logger.isTraceEnabled()) {
+//        Logger.trace(String.format("job.%s: begin",jobName));
+//      }
+
+//        log.trace(JOB_BOUNDARY,"begin: {}", jobName);
+        log.trace("> {}", jobName);
+        long startTs=System.currentTimeMillis();
         Monitor monitor = null;
         try {
             if (init()) {
@@ -201,8 +215,17 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
                 monitor.stop();
             }
             _finally();
+          long duration=System.currentTimeMillis()-startTs;
+//          if (Logger.isTraceEnabled()) {
+//            Logger.trace(String.format("job.%s: end (Took: %s ms.)",jobName, duration));
+//          }
+          log.trace("< {} (Took: {} ms.)", jobName,duration);
+//            log.trace(JOB_BOUNDARY,"end: {} (Took: {} ms.)", jobName,duration);
+          MDC.remove(Invoker.Invocation.IVK);
         }
-        return null;
+
+
+      return null;
     }
 
     @Override

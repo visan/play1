@@ -184,7 +184,7 @@ public class JobsPlugin extends PlayPlugin {
     @Override
     public void onApplicationStart() {
         int core = Integer.parseInt(Play.configuration.getProperty("play.jobs.pool", "10"));
-        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("jobs"), new ThreadPoolExecutor.AbortPolicy());
+        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("jb"), new ThreadPoolExecutor.AbortPolicy());
     }
 
     public static <V> void scheduleForCRON(Job<V> job) {

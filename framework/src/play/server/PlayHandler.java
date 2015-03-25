@@ -9,11 +9,12 @@ import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.frame.TooLongFrameException;
 import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.handler.codec.http.websocketx.*;
-import org.jboss.netty.handler.stream.ChunkedFile;
 import org.jboss.netty.handler.stream.ChunkedInput;
 import org.jboss.netty.handler.stream.ChunkedStream;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import play.Invoker;
 import play.Invoker.InvocationContext;
 import play.Logger;
@@ -64,7 +65,8 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
     private static final String ACCEPT_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     private static final Charset ASCII = Charset.forName("ASCII");
     private static final MessageDigest SHA_1;
-    
+
+
     /** 
      * The Pipeline is given for a PlayHandler 
      */
@@ -86,6 +88,8 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent messageEvent) throws Exception {
+        long startTs = System.currentTimeMillis();
+        log.trace("message: begin");
         if (Logger.isTraceEnabled()) {
             Logger.trace("messageReceived: begin");
         }
@@ -132,7 +136,6 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
 
                     // Deleguate to Play framework
                     Invoker.invoke(new NettyInvocation(request, response, ctx, nettyRequest, messageEvent));
-
                 }
 
             } catch (Exception ex) {
@@ -150,9 +153,12 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
         if (Logger.isTraceEnabled()) {
             Logger.trace("messageReceived: end");
         }
+        long duration=System.currentTimeMillis()-startTs;
+        log.trace("message: end. (Took {} ms.)",duration);
     }
 
     private static final Map<String, RenderStatic> staticPathsCache = new HashMap<String, RenderStatic>();
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(PlayHandler.class.getName());
 
     public class NettyInvocation extends Invoker.Invocation {
 
@@ -239,6 +245,9 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
 
         @Override
         public void run() {
+            MDC.put(Invoker.Invocation.IVK,this.getInvocationId());
+            long startTs = System.currentTimeMillis();
+            log.trace("begin");
             try {
                 if (Logger.isTraceEnabled()) {
                     Logger.trace("run: begin");
@@ -250,6 +259,9 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
             if (Logger.isTraceEnabled()) {
                 Logger.trace("run: end");
             }
+            long duration=System.currentTimeMillis()-startTs;
+            log.trace("end. (Took {} ms.)",duration);
+            MDC.remove(Invoker.Invocation.IVK);
         }
 
         @Override

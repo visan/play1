@@ -1,6 +1,7 @@
 package play;
 
 import java.lang.annotation.Annotation;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import play.Play.Mode;
 import play.exceptions.PlayException;
@@ -21,6 +23,7 @@ import play.exceptions.UnexpectedException;
 import play.i18n.Lang;
 import play.libs.F;
 import play.libs.F.Promise;
+import play.utils.NumberConverter;
 import play.utils.PThreadFactory;
 
 /**
@@ -166,7 +169,19 @@ public class Invoker {
      * An Invocation in something to run in a Play! context
      */
     public static abstract class Invocation implements Runnable {
+        private final String invokationId;
 
+        public static final String IVK = "IVK";
+      private static AtomicLong nodeLocalInvocationCounter = new AtomicLong();
+
+        public Invocation() {
+            this.invokationId = NumberConverter.toStringExt(nodeLocalInvocationCounter.incrementAndGet());
+          //()new BigInteger(this.hashCode()+"").toString(Character.MAX_RADIX)
+        }
+
+        public String getInvocationId() {
+            return invokationId;
+        }
         /**
          * If set, monitor the time the invocation waited in the queue
          */
@@ -319,7 +334,7 @@ public class Invoker {
      */
     static {
         int core = Integer.parseInt(Play.configuration.getProperty("play.pool", Play.mode == Mode.DEV ? "1" : ((Runtime.getRuntime().availableProcessors() + 1) + "")));
-        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("play"), new ThreadPoolExecutor.AbortPolicy());
+        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("pl"), new ThreadPoolExecutor.AbortPolicy());
     }
 
     /**

@@ -171,7 +171,7 @@ public class EclipseJdtApplicationCompiler implements ApplicationCompiler {
 //                if (Logger.isTraceEnabled()) {
 //                  Logger.trace("findType: %s", name);
 //                }
-                System.out.println("findType: "+name);
+//                System.out.println("findType: "+name);
                 try {
 
                     if (name.startsWith("play.") || name.startsWith("java.") || name.startsWith("javax.")) {
@@ -225,7 +225,7 @@ public class EclipseJdtApplicationCompiler implements ApplicationCompiler {
                 }
                 sb.append(new String(packageName));
                 String name = sb.toString();
-                System.out.println("isPackage: "+name);
+//                System.out.println("isPackage: "+name);
                 if (packagesCache.containsKey(name)) {
                     return packagesCache.get(name).booleanValue();
                 }
