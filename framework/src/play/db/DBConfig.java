@@ -37,27 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import javax.sql.RowSet;
-import javax.sql.rowset.CachedRowSet;
-
-import jregex.Matcher;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.internal.SessionImpl;
-
-import play.Logger;
-import play.Play;
-import play.db.jpa.JPA;
-import play.db.jpa.JPAConfig;
-import play.db.jpa.JPAContext;
-import play.exceptions.DatabaseException;
-
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.ConnectionCustomizer;
-import com.sun.rowset.CachedRowSetImpl;
 
 public class DBConfig {
 
@@ -330,11 +311,11 @@ public class DBConfig {
                   ds.setTestConnectionOnCheckout(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.testConnectionOnCheckout", "false")));//testConnectionOnCheckout
                   ds.setMaxStatements(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxStatements", "0")));//maxStatements
                   ds.setMaxStatementsPerConnection(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxStatementsPerConnection", "0")));//maxStatementsPerConnection
-
+                  ds.setConnectionCustomizerClassName(PoolConnectionCustomizerProxy.class.getName());//connectionCustomizerClassName
 /*
 
 automaticTestTable
-connectionCustomizerClassName
+
 connectionTesterClassName
 contextClassLoaderSource
 
@@ -377,12 +358,12 @@ usesTraditionalReflectiveProxies
                             ds.setPreferredTestQuery("/* ping */ SELECT 1");
                         }
                     }
-
-                    // This check is not required, but here to make it clear that nothing changes for people
-                    // that don't set this configuration property. It may be safely removed.
-                    if(p.getProperty("db.isolation") != null) {
-                        ds.setConnectionCustomizerClassName(DBConfig.PlayConnectionCustomizer.class.getName());
-                    }
+//removed as we need our own connection customization.
+//                    // This check is not required, but here to make it clear that nothing changes for people
+//                    // that don't set this configuration property. It may be safely removed.
+//                    if(p.getProperty("db.isolation") != null) {
+//                        ds.setConnectionCustomizerClassName(DBConfig.PlayConnectionCustomizer.class.getName());
+//                    }
 
                     datasource = ds;
                     url = ds.getJdbcUrl();
@@ -665,6 +646,28 @@ usesTraditionalReflectiveProxies
             } catch (NumberFormatException e) {
                 throw new DatabaseException("Invalid isolation level configuration" + isolation, e);
             }
+        }
+    }
+
+    public class PoolConnectionCustomizerProxy implements ConnectionCustomizer{
+        @Override
+        public void onAcquire(Connection connection, String s) throws Exception {
+            PoolConnectionCustomizer.getInstance().onAcquire(connection,s);
+        }
+
+        @Override
+        public void onDestroy(Connection connection, String s) throws Exception {
+            PoolConnectionCustomizer.getInstance().onDestroy(connection, s);
+        }
+
+        @Override
+        public void onCheckOut(Connection connection, String s) throws Exception {
+            PoolConnectionCustomizer.getInstance().onCheckOut(connection, s);
+        }
+
+        @Override
+        public void onCheckIn(Connection connection, String s) throws Exception {
+            PoolConnectionCustomizer.getInstance().onCheckIn(connection,s);
         }
     }
 }
