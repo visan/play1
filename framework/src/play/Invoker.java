@@ -172,7 +172,7 @@ public class Invoker {
         private final String invokationId;
 
         public static final String IVK = "IVK";
-      private static AtomicLong nodeLocalInvocationCounter = new AtomicLong();
+      private static volatile AtomicLong nodeLocalInvocationCounter = new AtomicLong();
 
         public Invocation() {
             this.invokationId = NumberConverter.toStringExt(nodeLocalInvocationCounter.incrementAndGet());
