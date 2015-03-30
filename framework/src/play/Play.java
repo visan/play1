@@ -332,16 +332,22 @@ public class Play {
         // Plugins
         pluginCollection.loadPlugins();
 
+      try {
         // Done !
         if (mode == Mode.PROD) {
-            if (preCompile() && System.getProperty("precompile") == null) {
-                start();
-            } else {
-                return;
-            }
+          if (preCompile() && System.getProperty("precompile") == null) {
+            start();
+          } else {
+            return;
+          }
         } else {
-            Logger.warn("You're running Play! in DEV mode");
+          Logger.warn("You're running Play! in DEV mode");
         }
+      }catch (Exception e){  //fail to start.
+        started=true;//set back true to unblock stop method body.
+        stop();
+        throw new RuntimeException(e);
+      }
 
         // Plugins
         pluginCollection.onApplicationReady();
@@ -599,6 +605,7 @@ public class Play {
                 Cache.stop();
             } catch (Exception ignored) {
             }
+          Logger.error(e,"Unexpected error. Play app is NOT started.");
             throw e;
         } catch (Exception e) {
             started = false;
@@ -606,6 +613,7 @@ public class Play {
                 Cache.stop();
             } catch (Exception ignored) {
             }
+          Logger.error(e,"Unexpected error. Play app is NOT started.");
             throw new UnexpectedException(e);
         }
     }
