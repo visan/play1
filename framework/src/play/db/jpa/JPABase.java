@@ -12,7 +12,9 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
 
+import play.Play;
 import play.PlayPlugin;
+import play.db.DBConfig;
 import play.exceptions.UnexpectedException;
 
 import javax.persistence.*;
@@ -28,7 +30,6 @@ import java.util.*;
  */
 @MappedSuperclass
 public class JPABase implements Serializable, play.db.Model {
-    
     private transient JPAConfig _jpaConfig = null;
 
     public JPAContext getJPAContext() {
@@ -43,6 +44,45 @@ public class JPABase implements Serializable, play.db.Model {
      */
     public static JPAConfig getJPAConfig(Class clazz) {
         return JPA.getJPAConfig( Entity2JPAConfigResolver.getJPAConfigNameForEntityClass(clazz));
+    }
+
+    public void _batchSave() {
+        getJPAContext().increaseBatch();
+        String configName = getJPAConfig(this.getClass()).getConfigName();
+        if (DBConfig.defaultDbConfigName.equalsIgnoreCase(configName)) {
+            configName = "db";
+        }
+        int batchSize = 1;
+        try {
+            batchSize = Integer.valueOf(Play.configuration.getProperty(configName + ".hibernate.jdbc.batch.size"));
+            if (batchSize < 1) {
+                batchSize = 1;
+            }
+        } catch (NumberFormatException e) {
+        }
+        if (!em().contains(this)) {
+            em().persist(this);
+            PlayPlugin.postEvent("JPASupport.objectPersisted", this);
+        }
+        avoidCascadeSaveLoops.set(new HashSet<JPABase>());
+        try {
+            saveAndCascade(true);
+        } finally {
+            avoidCascadeSaveLoops.get().clear();
+        }
+        try {
+            if (getJPAContext().getBatchCount() % batchSize == 0) {
+                em().flush();
+                em().clear();
+            }
+        } catch (PersistenceException e) {
+            if (e.getCause() instanceof GenericJDBCException) {
+                throw new PersistenceException(((GenericJDBCException) e.getCause()).getSQL(), e);
+            } else {
+                throw e;
+            }
+        }
+        avoidCascadeSaveLoops.set(new HashSet<JPABase>());
     }
 
     public void _save() {

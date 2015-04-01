@@ -18,9 +18,10 @@ public class JPAContext {
     private EntityManager entityManager;
     private boolean readonly = true;
   private long startTs;
+  private int batchCount;
 
     protected JPAContext(JPAConfig jpaConfig, boolean readonly, boolean beginTransaction) {
-
+        batchCount = 0;
         this.jpaConfig = jpaConfig;
 
         EntityManager manager = jpaConfig.newEntityManager();
@@ -112,5 +113,13 @@ public class JPAContext {
      */
     public boolean isInsideTransaction() {
         return entityManager.getTransaction() != null;
+    }
+
+  public int getBatchCount() {
+    return batchCount;
+  }
+
+  public void increaseBatch() {
+      batchCount++;
     }
 }
