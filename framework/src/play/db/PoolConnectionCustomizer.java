@@ -10,7 +10,7 @@ import java.sql.Connection;
 public class PoolConnectionCustomizer implements ConnectionCustomizer {
 
   private static volatile PoolConnectionCustomizer instance;
-  private static Object lock=new Object();
+  private static volatile Object lock=new Object();
 
   public static PoolConnectionCustomizer getInstance() {
     if (instance == null) {

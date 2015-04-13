@@ -52,7 +52,7 @@ public class JPAContext {
             if (entityManager.getTransaction().isActive()) {
                 if (readonly || rollback || entityManager.getTransaction().getRollbackOnly()) {
                     entityManager.getTransaction().rollback();
-                    log.trace("tx[{}]: rollbacked.(Took {} ms.)",jpaConfig.getConfigName(),duration);
+                    log.trace("tx[{}]: rollbacked.(Took {} ms.) Reason: {}",jpaConfig.getConfigName(),duration,readonly?"ro":"rb");
                 } else {
                     try {
                         entityManager.getTransaction().commit();
