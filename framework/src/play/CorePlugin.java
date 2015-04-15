@@ -290,7 +290,7 @@ public class CorePlugin extends PlayPlugin {
 //            PropertiesEnhancer.class,
             ContinuationEnhancer.class,
 //            SigEnhancer.class,
-            ControllersEnhancer.class,
+            //ControllersEnhancer.class,
 //            MailerEnhancer.class,
 //            LVEnhancer.class
         };

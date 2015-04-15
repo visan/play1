@@ -9,8 +9,11 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
+import com.google.protobuf.AbstractMessageLite;
+import com.google.protobuf.MessageLite;
 import org.w3c.dom.Document;
 
 import play.Invoker.Suspend;
@@ -279,6 +282,42 @@ public class Controller implements ControllerSupport {
             Request.current().isNew = false;
             verifyContinuationsEnhancement();
             storeOrRestoreDataStateForContinuations( false );
+            Continuation.suspend(future);
+            return null;
+        }
+    }
+    private final static Map<Integer, Future> futureMap = new ConcurrentHashMap<Integer, Future>();
+
+    @SuppressWarnings("unchecked")
+    protected static <T> T awaitProto(com.google.protobuf.MessageLite reqMsg, Future<T> future) {
+
+        if(future != null) {
+            futureMap.put(reqMsg.hashCode(), future);
+        } else if(futureMap.containsKey(reqMsg.hashCode())) {
+            // Since the continuation will restart in this code that isn't intstrumented by javaflow,
+            // we need to reset the state manually.
+            StackRecorder.get().isCapturing = false;
+            StackRecorder.get().isRestoring = false;
+            StackRecorder.get().value = null;
+            future = (Future<T>)futureMap.get(reqMsg.hashCode());
+
+            // Now reset the Controller invocation context
+//            ControllerInstrumentation.stopActionCall();
+            storeOrRestoreDataStateForContinuations( true );
+        } else {
+            throw new UnexpectedException("Lost promise for " + reqMsg.toString() + "!");
+        }
+
+        if(future.isDone()) {
+            try {
+                return future.get();
+            } catch(Exception e) {
+                throw new UnexpectedException(e);
+            }
+        } else {
+//            Request.current().isNew = false;
+            verifyContinuationsEnhancement();
+//            storeOrRestoreDataStateForContinuations( false );
             Continuation.suspend(future);
             return null;
         }
