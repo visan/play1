@@ -649,25 +649,4 @@ usesTraditionalReflectiveProxies
         }
     }
 
-    public static class PoolConnectionCustomizerProxy implements ConnectionCustomizer{
-        @Override
-        public void onAcquire(Connection connection, String s) throws Exception {
-            PoolConnectionCustomizer.getInstance().onAcquire(connection,s);
-        }
-
-        @Override
-        public void onDestroy(Connection connection, String s) throws Exception {
-            PoolConnectionCustomizer.getInstance().onDestroy(connection, s);
-        }
-
-        @Override
-        public void onCheckOut(Connection connection, String s) throws Exception {
-            PoolConnectionCustomizer.getInstance().onCheckOut(connection, s);
-        }
-
-        @Override
-        public void onCheckIn(Connection connection, String s) throws Exception {
-            PoolConnectionCustomizer.getInstance().onCheckIn(connection,s);
-        }
-    }
 }
