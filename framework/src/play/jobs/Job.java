@@ -172,33 +172,19 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
 
   @Override
   public void run() {
-    preCall();
     call();
-    postCall();
-  }
-
-  protected void postCall() {
-    MDC.remove(Invoker.Invocation.IVK);
-  }
-
-  protected void preCall() {
-    MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
   }
 
   public V call() {
-//      MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
-    String jobName = this.getClass().getName();
-//      if (Logger.isTraceEnabled()) {
-//        Logger.trace(String.format("job.%s: begin",jobName));
-//      }
-
-//        log.trace(JOB_BOUNDARY,"begin: {}", jobName);
-    log.trace("> {}", jobName);
     long startTs = System.currentTimeMillis();
     Monitor monitor = null;
+    String jobName = this.getClass().getName();
+    MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
     try {
       if (init()) {
+
         before();
+        log.trace("> {}", jobName);
         V result = null;
 
         try {
@@ -227,17 +213,11 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
       if (monitor != null) {
         monitor.stop();
       }
-      _finally();
       long duration = System.currentTimeMillis() - startTs;
-//          if (Logger.isTraceEnabled()) {
-//            Logger.trace(String.format("job.%s: end (Took: %s ms.)",jobName, duration));
-//          }
       log.trace("< {} (Took: {} ms.)", jobName, duration);
-//            log.trace(JOB_BOUNDARY,"end: {} (Took: {} ms.)", jobName,duration);
-//          MDC.remove(Invoker.Invocation.IVK);
+      _finally();
+      MDC.remove(Invoker.Invocation.IVK);
     }
-
-
     return null;
   }
 
