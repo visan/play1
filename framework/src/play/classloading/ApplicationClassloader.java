@@ -408,7 +408,7 @@ public class ApplicationClassloader extends ClassLoader {
                 }
 
             } else {
-
+                long start=System.currentTimeMillis();
                 if (!Play.pluginCollection.compileSources()) {
 
                     List<ApplicationClass> all = new ArrayList<ApplicationClass>();
@@ -416,6 +416,7 @@ public class ApplicationClassloader extends ClassLoader {
                     for (VirtualFile virtualFile : Play.javaPath) {
                         all.addAll(getAllClasses(virtualFile));
                     }
+                    Logger.info("Compile %s classes...", all.size());
                     List<String> classNames = new ArrayList<String>();
                     for (int i = 0; i < all.size(); i++) {
                         ApplicationClass applicationClass = all.get(i);
@@ -425,9 +426,11 @@ public class ApplicationClassloader extends ClassLoader {
                     }
 
                     Play.classes.compiler.compile(classNames.toArray(new String[classNames.size()]));
+                    Logger.info("Done.Compiled %s classes. Took %s msec.", all.size(),System.currentTimeMillis()-start);
 
                 }
-
+                start=System.currentTimeMillis();
+                Logger.info("Loading %s classes...", Play.classes.all().size());
                 for (ApplicationClass applicationClass : Play.classes.all()) {
                     Class clazz = loadApplicationClass(applicationClass.name);
                     if (clazz != null) {
@@ -441,6 +444,7 @@ public class ApplicationClassloader extends ClassLoader {
                         return o1.getName().compareTo(o2.getName());
                     }
                 });
+                Logger.info("Done.Loaded %s classes. Took %s msec.", Play.classes.all().size(), System.currentTimeMillis() - start);
             }
         }
         return allClasses;
