@@ -315,10 +315,13 @@ public class Play {
         // Load the templates from the framework after the one from the modules
         templatesPath.add(VirtualFile.open(new File(frameworkPath, "framework/templates")));
 
+        long start = System.currentTimeMillis();
+        Logger.info("Instantiate classloader...");
         // Enable a first classloader
         classloader = new ApplicationClassloader();
+        Logger.info("Done. Instantiated classloader. Took %s msec.", System.currentTimeMillis()-start);
 
-        // Fix ctxPath
+      // Fix ctxPath
         if ("/".equals(Play.ctxPath)) {
             Play.ctxPath = "";
         }
@@ -748,6 +751,8 @@ public class Play {
      * @param appRoot : the application path virtual file
      */
     public static void loadModules(VirtualFile appRoot) {
+        Logger.info("Loading modules...");
+        long start=System.currentTimeMillis();
         if (System.getenv("MODULES") != null) {
             // Modules path is prepended with a env property
             if (System.getenv("MODULES") != null && System.getenv("MODULES").trim().length() > 0) {
@@ -808,7 +813,8 @@ public class Play {
 					}
 				}
 			}
-		}
+      Logger.info("Loaded modules. Took %s msec.",System.currentTimeMillis()-start);
+    }
 
 //        // Auto add special modules
 //        if (Play.runningInTestMode()) {
