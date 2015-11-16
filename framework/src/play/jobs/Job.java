@@ -37,8 +37,16 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   protected long lastRun = 0;
   protected boolean wasError = false;
   protected Throwable lastException = null;
+  protected String hkey;
 
   Date nextPlannedExecution = null;
+
+  public Job() {
+    hkey=this.getClass().getName();
+  }
+  public Job(String hkey) {
+    this.hkey = hkey;
+  }
 
   @Override
   public InvocationContext getInvocationContext() {
@@ -178,19 +186,18 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   public V call() {
     long startTs = System.currentTimeMillis();
     Monitor monitor = null;
-    String jobName = this.getClass().getName();
     MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
     try {
       if (init()) {
 
         before();
-        log.trace("> {}", jobName);
+        log.trace("> {}", hkey);
         V result = null;
 
         try {
           lastException = null;
           lastRun = System.currentTimeMillis();
-          monitor = MonitorFactory.start(getClass().getName() + ".doJob()");
+          monitor = MonitorFactory.start(hkey);
           result = doJobWithResult();
           monitor.stop();
           monitor = null;
@@ -214,7 +221,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
         monitor.stop();
       }
       long duration = System.currentTimeMillis() - startTs;
-      log.trace("< {} (Took: {} ms.)", jobName, duration);
+      log.trace("< {} (Took: {} ms.)", hkey, duration);
       _finally();
       MDC.remove(Invoker.Invocation.IVK);
     }
