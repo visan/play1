@@ -1,6 +1,7 @@
 package play.classloading;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.LoggerFactory;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
@@ -32,6 +33,7 @@ import static org.apache.commons.io.IOUtils.closeQuietly;
  * Load the classes from the application Java sources files.
  */
 public class ApplicationClassloader extends ClassLoader {
+    public static org.slf4j.Logger log4j = LoggerFactory.getLogger("PlayApplicationClassloader");
 
 
     private final ClassStateHashCreator classStateHashCreator = new ClassStateHashCreator();
@@ -69,6 +71,10 @@ public class ApplicationClassloader extends ClassLoader {
      */
     @Override
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        long start = 0;
+        if (log4j.isTraceEnabled()) {
+            start = System.currentTimeMillis();
+        }
         Class<?> c = findLoadedClass(name);
         if (c != null) {
             return c;
@@ -84,7 +90,11 @@ public class ApplicationClassloader extends ClassLoader {
         }
 
         // Delegate to the classic classloader
-        return super.loadClass(name, resolve);
+        Class<?> aClass = super.loadClass(name, resolve);
+        if (log4j.isTraceEnabled()) {
+            log4j.trace(": loadClass: {}: {}: {}: ms", name, resolve, System.currentTimeMillis() - start);
+        }
+        return aClass;
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,7 +124,14 @@ public class ApplicationClassloader extends ClassLoader {
                     }
                     clazz = defineClass(name, code, 0, code.length, protectionDomain);
                 }
+                long start = 0;
+                if (log4j.isTraceEnabled()) {
+                    start = System.currentTimeMillis();
+                }
                 ApplicationClass applicationClass = Play.classes.getApplicationClass(name);
+                if (log4j.isTraceEnabled()) {
+                    log4j.trace(": getApplicationClass: {}: {}: ms", name, System.currentTimeMillis() - start);
+                }
                 if (applicationClass != null) {
                     applicationClass.javaClass = clazz;
                     if (!applicationClass.isClass()) {
