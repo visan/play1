@@ -25,6 +25,7 @@ import java.security.Permissions;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -37,6 +38,7 @@ public class ApplicationClassloader extends ClassLoader {
 
 
     private final ClassStateHashCreator classStateHashCreator = new ClassStateHashCreator();
+    private final static ConcurrentHashMap<String, Class> classLoaderCache = new ConcurrentHashMap<String, Class>();
 
     /**
      * A representation of the current state of the ApplicationClassloader.
@@ -70,31 +72,51 @@ public class ApplicationClassloader extends ClassLoader {
      * You know ...
      */
     @Override
-    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        long start = 0;
-        if (log4j.isTraceEnabled()) {
-            start = System.currentTimeMillis();
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        long start = System.currentTimeMillis();
+        if (classLoaderCache.containsKey(name)) {
+            printLogEnd("findInClassLoaderCache", name, resolve, System.currentTimeMillis() - start);
+            return classLoaderCache.get(name);
         }
+
         Class<?> c = findLoadedClass(name);
         if (c != null) {
+            classLoaderCache.put(name, c);
+            printLogEnd("findLoadedClass", name, resolve, System.currentTimeMillis() - start);
             return c;
         }
 
-        // First check if it's an application Class
-        Class<?> applicationClass = loadApplicationClass(name);
-        if (applicationClass != null) {
-            if (resolve) {
-                resolveClass(applicationClass);
+        synchronized (classLoaderCache) {
+            // First check if it's an application Class
+            Class<?> applicationClass = loadApplicationClass(name);
+            if (applicationClass != null) {
+                if (resolve) {
+                    resolveClass(applicationClass);
+                }
+                classLoaderCache.put(name, applicationClass);
+                printLogEnd("loadApplicationClass", name, resolve, System.currentTimeMillis() - start);
+                return applicationClass;
             }
-            return applicationClass;
         }
 
         // Delegate to the classic classloader
         Class<?> aClass = super.loadClass(name, resolve);
-        if (log4j.isTraceEnabled()) {
-            log4j.trace(": loadClass: {}: {}: {}: ms", name, resolve, System.currentTimeMillis() - start);
-        }
+        classLoaderCache.put(name, aClass);
+        printLogEnd("super.loadClass", name, resolve, System.currentTimeMillis() - start);
         return aClass;
+
+    }
+
+    private void printLogStart(String part, String name, boolean resolve) {
+        if (log4j.isTraceEnabled()) {
+            log4j.trace("# start# {}# {}# {}# ", part, name, resolve);
+        }
+    }
+
+    private void printLogEnd(String part, String name, boolean resolve, long time) {
+        if (log4j.isTraceEnabled()) {
+            log4j.trace("# end# {}# {}# {}# {}# ms", part, name, resolve, time);
+        }
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,14 +146,7 @@ public class ApplicationClassloader extends ClassLoader {
                     }
                     clazz = defineClass(name, code, 0, code.length, protectionDomain);
                 }
-                long start = 0;
-                if (log4j.isTraceEnabled()) {
-                    start = System.currentTimeMillis();
-                }
                 ApplicationClass applicationClass = Play.classes.getApplicationClass(name);
-                if (log4j.isTraceEnabled()) {
-                    log4j.trace(": getApplicationClass: {}: {}: ms", name, System.currentTimeMillis() - start);
-                }
                 if (applicationClass != null) {
                     applicationClass.javaClass = clazz;
                     if (!applicationClass.isClass()) {
