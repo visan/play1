@@ -8,6 +8,7 @@ import org.hibernate.EmptyInterceptor;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.type.Type;
+import play.InternalCache;
 import play.Logger;
 import play.Play;
 import play.PlayPlugin;
@@ -723,7 +724,8 @@ public class JPAPlugin extends PlayPlugin {
                 List<Field> fields = new ArrayList<Field>();
                 while (!c.equals(Object.class)) {
                     for (Field field : c.getDeclaredFields()) {
-                        if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(EmbeddedId.class)) {
+                        //TODO: add cashe field->isAnnotationPresent
+                        if (InternalCache.isAnnotationPresent(Id.class,field) || InternalCache.isAnnotationPresent(EmbeddedId.class,field)) {
                             field.setAccessible(true);
                             fields.add(field);
                         }

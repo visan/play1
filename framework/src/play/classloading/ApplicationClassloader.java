@@ -2,6 +2,7 @@ package play.classloading;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
+import play.InternalCache;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
@@ -29,7 +30,7 @@ import java.util.*;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
- * The application classLoader. 
+ * The application classLoader.
  * Load the classes from the application Java sources files.
  */
 public class ApplicationClassloader extends ClassLoader {
@@ -474,11 +475,15 @@ public class ApplicationClassloader extends ClassLoader {
      * @return A list of class
      */
     public List<Class> getAssignableClasses(Class clazz) {
+        List<Class> assignableClasses = InternalCache.getAssignableClasses(clazz);
+        if(assignableClasses!=null) return assignableClasses;
         getAllClasses();
         List<Class> results = new ArrayList<Class>();
         for (ApplicationClass c : Play.classes.getAssignableClasses(clazz)) {
             results.add(c.javaClass);
         }
+        //TODO: add cache for: clazz.getName->results, we need this to speed up binding in particular.
+        InternalCache.cacheAssignableClasses(clazz,results);
         return results;
     }
 
