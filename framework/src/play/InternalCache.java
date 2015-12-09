@@ -22,9 +22,10 @@ public class InternalCache {
   }
 
   public static void cacheAssignableClasses(Class clazz, List<Class> results) {
+    String key = clazz.getName();
     synchronized (assignalbeClassesMap) {
-      if (!assignalbeClassesMap.containsKey(clazz.getName())) {
-        assignalbeClassesMap.put(clazz.getName(), results);
+      if (!assignalbeClassesMap.containsKey(key)) {
+        assignalbeClassesMap.put(key, results);
       }
     }
   }
@@ -44,7 +45,13 @@ public class InternalCache {
   }
 
   private static AnnotationResolution getAnnotationResolution(Class annotationClass, Field field) {
-    String key = field.getDeclaringClass().getName() + "_" + field.getName() + "_" + annotationClass.getName();
+    StringBuilder keyBuilder = new StringBuilder(field.getDeclaringClass().getName().length()+field.getName().length()+annotationClass.getName()+5);
+    keyBuilder.append(field.getDeclaringClass().getName());
+    keyBuilder.append("_");
+    keyBuilder.append(field.getName());
+    keyBuilder.append("_");
+    keyBuilder.append(annotationClass.getName());
+    String key = keyBuilder.toString();
     if (isDebug) System.out.println("AnnotationResolution: key:" + key);
     AnnotationResolution annotationResolution = fieldAnnotationMap.get(key);
     if (annotationResolution == null) {
