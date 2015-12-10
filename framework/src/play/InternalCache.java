@@ -19,6 +19,11 @@ public class InternalCache {
   private static boolean enableAssignableClasses=false;
   private static boolean enableAnnotationPresent=false;
 
+  static {
+    enableAssignableClasses = Boolean.valueOf(System.getProperty("play.enableAssignableClasses"));
+    enableAnnotationPresent = Boolean.valueOf(System.getProperty("play.enableAnnotationPresent"));
+  }
+
   public static List<Class> getAssignableClasses(Class clazz) {
     return assignalbeClassesMap.get(clazz.getName());
   }

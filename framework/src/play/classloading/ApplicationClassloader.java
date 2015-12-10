@@ -36,11 +36,15 @@ import static org.apache.commons.io.IOUtils.closeQuietly;
  */
 public class ApplicationClassloader extends ClassLoader {
     public static org.slf4j.Logger log4j = LoggerFactory.getLogger("PlayApplicationClassloader");
+    private static boolean enableClassLoaderCache = false;
 
 
     private final ClassStateHashCreator classStateHashCreator = new ClassStateHashCreator();
     private final static ConcurrentHashMap<String, Class> classLoaderCache = new ConcurrentHashMap<String, Class>();
 
+    static {
+        enableClassLoaderCache = Boolean.valueOf(System.getProperty("play.enableClassLoaderCache"));
+    }
     /**
      * A representation of the current state of the ApplicationClassloader.
      * It gets a new value each time the state of the classloader changes.
@@ -75,14 +79,18 @@ public class ApplicationClassloader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         long start = System.currentTimeMillis();
-        if (classLoaderCache.containsKey(name)) {
-            printLogEnd("findInClassLoaderCache", name, resolve, System.currentTimeMillis() - start);
-            return classLoaderCache.get(name);
+        if (enableClassLoaderCache) {
+            if (classLoaderCache.containsKey(name)) {
+                printLogEnd("findInClassLoaderCache", name, resolve, System.currentTimeMillis() - start);
+                return classLoaderCache.get(name);
+            }
         }
 
         Class<?> c = findLoadedClass(name);
         if (c != null) {
-            classLoaderCache.put(name, c);
+            if (enableClassLoaderCache) {
+                classLoaderCache.put(name, c);
+            }
             printLogEnd("findLoadedClass", name, resolve, System.currentTimeMillis() - start);
             return c;
         }
@@ -94,27 +102,24 @@ public class ApplicationClassloader extends ClassLoader {
                 if (resolve) {
                     resolveClass(applicationClass);
                 }
-                classLoaderCache.put(name, applicationClass);
-                printLogEnd("loadApplicationClass", name, resolve, System.currentTimeMillis() - start);
+                if (enableClassLoaderCache) {
+                    classLoaderCache.put(name, applicationClass);
+                }
                 return applicationClass;
             }
         }
 
         // Delegate to the classic classloader
         Class<?> aClass = super.loadClass(name, resolve);
-        classLoaderCache.put(name, aClass);
+        if (enableClassLoaderCache) {
+            classLoaderCache.put(name, aClass);
+        }
         printLogEnd("super.loadClass", name, resolve, System.currentTimeMillis() - start);
         return aClass;
 
     }
 
-    private void printLogStart(String part, String name, boolean resolve) {
-        if (log4j.isTraceEnabled()) {
-            log4j.trace("# start# {}# {}# {}# ", part, name, resolve);
-        }
-    }
-
-    private void printLogEnd(String part, String name, boolean resolve, long time) {
+    private static void printLogEnd(String part, String name, boolean resolve, long time) {
         if (log4j.isTraceEnabled()) {
             log4j.trace("# end# {}# {}# {}# {}# ms", part, name, resolve, time);
         }
