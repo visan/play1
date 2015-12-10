@@ -725,9 +725,16 @@ public class JPAPlugin extends PlayPlugin {
                 while (!c.equals(Object.class)) {
                     for (Field field : c.getDeclaredFields()) {
                         //TODO: add cashe field->isAnnotationPresent
-                        if (InternalCache.isAnnotationPresent(Id.class,field) || InternalCache.isAnnotationPresent(EmbeddedId.class,field)) {
-                            field.setAccessible(true);
-                            fields.add(field);
+                        if(InternalCache.isEnableAnnotationPresent()) {
+                            if (InternalCache.isAnnotationPresent(Id.class, field) || InternalCache.isAnnotationPresent(EmbeddedId.class, field)) {
+                                field.setAccessible(true);
+                                fields.add(field);
+                            }
+                        }else {
+                            if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(EmbeddedId.class)) {
+                                field.setAccessible(true);
+                                fields.add(field);
+                            }
                         }
                     }
                     c = c.getSuperclass();
