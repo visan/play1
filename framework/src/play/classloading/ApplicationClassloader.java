@@ -490,15 +490,19 @@ public class ApplicationClassloader extends ClassLoader {
      * @return A list of class
      */
     public List<Class> getAssignableClasses(Class clazz) {
-        List<Class> assignableClasses = InternalCache.getAssignableClasses(clazz);
-        if(assignableClasses!=null) return assignableClasses;
+        if(InternalCache.isEnableAssignableClasses()) {
+            List<Class> assignableClasses = InternalCache.getAssignableClasses(clazz);
+            if (assignableClasses != null) return assignableClasses;
+        }
         getAllClasses();
         List<Class> results = new ArrayList<Class>();
         for (ApplicationClass c : Play.classes.getAssignableClasses(clazz)) {
             results.add(c.javaClass);
         }
         //TODO: add cache for: clazz.getName->results, we need this to speed up binding in particular.
-        InternalCache.cacheAssignableClasses(clazz,results);
+        if(InternalCache.isEnableAssignableClasses()) {
+            InternalCache.cacheAssignableClasses(clazz, results);
+        }
         return results;
     }
 

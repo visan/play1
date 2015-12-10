@@ -16,6 +16,8 @@ public class InternalCache {
   private static final Map<String, List<Class>> assignalbeClassesMap = new ConcurrentHashMap<String, List<Class>>(1000);
   private static final Map<String, AnnotationResolution> fieldAnnotationMap = new ConcurrentHashMap<String, AnnotationResolution>(1000);
   private static final boolean isDebug = false;
+  private static boolean enableAssignableClasses=false;
+  private static boolean enableAnnotationPresent=false;
 
   public static List<Class> getAssignableClasses(Class clazz) {
     return assignalbeClassesMap.get(clazz.getName());
@@ -28,6 +30,22 @@ public class InternalCache {
         assignalbeClassesMap.put(key, results);
       }
     }
+  }
+
+  public static boolean isEnableAssignableClasses() {
+    return enableAssignableClasses;
+  }
+
+  public static void setEnableAssignableClasses(boolean enableAssignableClasses) {
+    InternalCache.enableAssignableClasses = enableAssignableClasses;
+  }
+
+  public static boolean isEnableAnnotationPresent() {
+    return enableAnnotationPresent;
+  }
+
+  public static void setEnableAnnotationPresent(boolean enableAnnotationPresent) {
+    InternalCache.enableAnnotationPresent = enableAnnotationPresent;
   }
 
   static class AnnotationResolution {
@@ -45,7 +63,7 @@ public class InternalCache {
   }
 
   private static AnnotationResolution getAnnotationResolution(Class annotationClass, Field field) {
-    StringBuilder keyBuilder = new StringBuilder(field.getDeclaringClass().getName().length()+field.getName().length()+annotationClass.getName()+5);
+    StringBuilder keyBuilder = new StringBuilder(field.getDeclaringClass().getName().length() + field.getName().length() + annotationClass.getName() + 5);
     keyBuilder.append(field.getDeclaringClass().getName());
     keyBuilder.append("_");
     keyBuilder.append(field.getName());

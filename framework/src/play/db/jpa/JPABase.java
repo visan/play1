@@ -181,17 +181,32 @@ public class JPABase implements Serializable, play.db.Model {
                 //TODO: add cache for field->isPresent(X)
 //                Annotation annotation = InternalCache.getAnnotation(OneToOne.class, field);
 //                boolean isAnnotationPresent=InternalCache.isAnnotationPresent(OneToOne.class, field);
-                if (InternalCache.isAnnotationPresent(OneToOne.class,field)) {
-                    doCascade = cascadeAll(((OneToOne)InternalCache.getAnnotation(OneToOne.class,field)).cascade());
-                }
-                if (InternalCache.isAnnotationPresent(OneToMany.class,field)) {
-                    doCascade = cascadeAll(((OneToMany)InternalCache.getAnnotation(OneToMany.class,field)).cascade());
-                }
-                if (InternalCache.isAnnotationPresent(ManyToOne.class,field)) {
-                    doCascade = cascadeAll(((ManyToOne)InternalCache.getAnnotation(ManyToOne.class,field)).cascade());
-                }
-                if (InternalCache.isAnnotationPresent(ManyToMany.class,field)) {
-                    doCascade = cascadeAll(((ManyToMany)InternalCache.getAnnotation(ManyToMany.class,field)).cascade());
+                if(InternalCache.isEnableAnnotationPresent()){
+                    if (InternalCache.isAnnotationPresent(OneToOne.class,field)) {
+                        doCascade = cascadeAll(((OneToOne)InternalCache.getAnnotation(OneToOne.class,field)).cascade());
+                    }
+                    if (InternalCache.isAnnotationPresent(OneToMany.class,field)) {
+                        doCascade = cascadeAll(((OneToMany)InternalCache.getAnnotation(OneToMany.class,field)).cascade());
+                    }
+                    if (InternalCache.isAnnotationPresent(ManyToOne.class,field)) {
+                        doCascade = cascadeAll(((ManyToOne)InternalCache.getAnnotation(ManyToOne.class,field)).cascade());
+                    }
+                    if (InternalCache.isAnnotationPresent(ManyToMany.class,field)) {
+                        doCascade = cascadeAll(((ManyToMany)InternalCache.getAnnotation(ManyToMany.class,field)).cascade());
+                    }
+                }else {
+                    if (field.isAnnotationPresent(OneToOne.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(OneToOne.class).cascade());
+                    }
+                    if (field.isAnnotationPresent(OneToMany.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(OneToMany.class).cascade());
+                    }
+                    if (field.isAnnotationPresent(ManyToOne.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(ManyToOne.class).cascade());
+                    }
+                    if (field.isAnnotationPresent(ManyToMany.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(ManyToMany.class).cascade());
+                    }
                 }
                 if (doCascade) {
                     Object value = field.get(this);
