@@ -31,19 +31,30 @@ import play.utils.PThreadFactory;
  */
 public class Invoker {
 
+    private static final String IVK_EXECUTOR_QUEUE_MONITOR_HKEY = "IVK_POOL_QUEUE";
+    private static final String IVK_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY = "IVK_POOL_ACTIVE_COUNT";
+    private static final String IVK_EXECUTOR_TASK_COUNT_MONITOR_HKEY = "IVK_POOL_TASK_COUNT";
+    private static final String IVK_EXECUTOR_POOL_SIZE_MONITOR_HKEY = "IVK_POOL_POOL_SIZE";
     /**
      * Main executor for requests invocations.
      */
     public static ScheduledThreadPoolExecutor executor = null;
+
+    private static void updateInvokerPoolMonitors() {
+        MonitorFactory.getMonitor(IVK_EXECUTOR_QUEUE_MONITOR_HKEY, "elmts.")       .add(Invoker.executor.getQueue().size());
+        MonitorFactory.getMonitor(IVK_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY, "elmts.").add(Invoker.executor.getActiveCount());
+        MonitorFactory.getMonitor(IVK_EXECUTOR_TASK_COUNT_MONITOR_HKEY, "elmts.")  .add(Invoker.executor.getTaskCount());
+        MonitorFactory.getMonitor(IVK_EXECUTOR_POOL_SIZE_MONITOR_HKEY, "elmts.")   .add(Invoker.executor.getPoolSize());
+    }
 
     /**
      * Run the code in a new thread took from a thread pool.
      * @param invocation The code to run
      * @return The future object, to know when the task is completed
      */
+
     public static Future<?> invoke(final Invocation invocation) {
-        Monitor monitor = MonitorFactory.getMonitor("Invoker queue size", "elmts.");
-        monitor.add(executor.getQueue().size());
+        updateInvokerPoolMonitors();
         invocation.waitInQueue = MonitorFactory.start("Waiting for execution");
         return executor.submit(invocation);
     }
@@ -55,8 +66,7 @@ public class Invoker {
      * @return The future object, to know when the task is completed
      */
     public static Future<?> invoke(final Invocation invocation, long millis) {
-        Monitor monitor = MonitorFactory.getMonitor("Invocation queue", "elmts.");
-        monitor.add(executor.getQueue().size());
+        updateInvokerPoolMonitors();
         return executor.schedule(invocation, millis, TimeUnit.MILLISECONDS);
     }
 

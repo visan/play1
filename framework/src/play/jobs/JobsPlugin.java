@@ -113,6 +113,7 @@ public class JobsPlugin extends PlayPlugin {
                     try {
                         Job<?> job = ((Job<?>) clazz.newInstance());
                         scheduledJobs.add(job);
+                        job.startWiqMonitor();
                         job.run();
                         if(job.wasError) {
                             if(job.lastException != null) {
@@ -138,6 +139,7 @@ public class JobsPlugin extends PlayPlugin {
                         //start running job now in the background
                         @SuppressWarnings("unchecked")
                         Callable<Job> callable = (Callable<Job>)job;
+                        job.startWiqMonitor();
                         executor.submit(callable);
                     } catch (InstantiationException ex) {
                         throw new UnexpectedException("Cannot instanciate Job " + clazz.getName());
@@ -170,6 +172,7 @@ public class JobsPlugin extends PlayPlugin {
                     }
                     value = Expression.evaluate(value, value).toString();
                     if(!"never".equalsIgnoreCase(value)){
+                        job.startWiqMonitor();
                         executor.scheduleWithFixedDelay(job, Time.parseDuration(value), Time.parseDuration(value), TimeUnit.SECONDS);
                     }
                 } catch (InstantiationException ex) {
@@ -216,6 +219,8 @@ public class JobsPlugin extends PlayPlugin {
                 nextDate = cronExp.getNextValidTimeAfter(nextInvalid);
             }
             job.nextPlannedExecution = nextDate;
+            job.startWiqMonitor();
+            Job.updateJobPoolMonitors();
             executor.schedule((Callable<V>)job, nextDate.getTime() - now.getTime(), TimeUnit.MILLISECONDS);
             job.executor = executor;
         } catch (Exception ex) {
