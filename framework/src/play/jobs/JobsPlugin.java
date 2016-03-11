@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
+import com.jamonapi.MonitorFactory;
 import play.Logger;
 import play.Play;
 import play.PlayPlugin;
@@ -220,7 +221,7 @@ public class JobsPlugin extends PlayPlugin {
             }
             job.nextPlannedExecution = nextDate;
             job.startWiqMonitor();
-            Job.updateJobPoolMonitors();
+            updateJobPoolMonitors();
             executor.schedule((Callable<V>)job, nextDate.getTime() - now.getTime(), TimeUnit.MILLISECONDS);
             job.executor = executor;
         } catch (Exception ex) {
@@ -228,6 +229,17 @@ public class JobsPlugin extends PlayPlugin {
         }
     }
 
+    public static final String JOB_EXECUTOR_QUEUE_MONITOR_HKEY =        "JOB_POOL_QUEUE";
+    public static final String JOB_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY = "JOB_POOL_ACTIVE_COUNT";
+    public static final String JOB_EXECUTOR_TASK_COUNT_MONITOR_HKEY =   "JOB_POOL_TASK_COUNT";
+    public static final String JOB_EXECUTOR_POOL_SIZE_MONITOR_HKEY =    "JOB_POOL_POOL_SIZE";
+
+    public static void updateJobPoolMonitors() {
+        MonitorFactory.getMonitor(JOB_EXECUTOR_QUEUE_MONITOR_HKEY, "elmts.")       .add(JobsPlugin.executor.getQueue().size());
+        MonitorFactory.getMonitor(JOB_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY, "elmts.").add(JobsPlugin.executor.getActiveCount());
+        MonitorFactory.getMonitor(JOB_EXECUTOR_TASK_COUNT_MONITOR_HKEY, "elmts.")  .add(JobsPlugin.executor.getTaskCount());
+        MonitorFactory.getMonitor(JOB_EXECUTOR_POOL_SIZE_MONITOR_HKEY, "elmts.")   .add(JobsPlugin.executor.getPoolSize());
+    }
     @Override
     public void onApplicationStop() {
 

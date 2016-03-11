@@ -31,13 +31,7 @@ import com.jamonapi.MonitorFactory;
  */
 public class Job<V> extends Invoker.Invocation implements Callable<V> {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(Job.class.getName());
-  private static final Marker JOB_BOUNDARY = MarkerFactory.getMarker("JOB_BOUNDARY");
   public static final String invocationType = "Job";
-//  public static final String JOB_EXECUTOR_MONITOR_HKEY = "JOB_EXECUTOR_MONITOR_HKEY";
-  public static final String JOB_EXECUTOR_QUEUE_MONITOR_HKEY =        "JOB_POOL_QUEUE";
-  public static final String JOB_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY = "JOB_POOL_ACTIVE_COUNT";
-  public static final String JOB_EXECUTOR_TASK_COUNT_MONITOR_HKEY =   "JOB_POOL_TASK_COUNT";
-  public static final String JOB_EXECUTOR_POOL_SIZE_MONITOR_HKEY =    "JOB_POOL_POOL_SIZE";
 
   protected ExecutorService executor;
   protected long lastRun = 0;
@@ -49,8 +43,8 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   protected Monitor waitInQueueMonitor;
 
   public Job() {
-    this("");
   }
+
   public Job(String hkey) {
     this.hkey = hkey;
   }
@@ -60,7 +54,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   }
 
   private String composeEffHkey() {
-    return this.getClass().getName()+"_"+hkey;
+    return hkey==null?this.getClass().getName():hkey;
   }
   @Override
   public InvocationContext getInvocationContext() {
@@ -91,21 +85,15 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
    * @return the job completion
    */
   public Promise<V> now() {
-//    Monitor monitor = MonitorFactory.getMonitor(JOB_EXECUTOR_MONITOR_HKEY, "elmts.");
-    updateJobPoolMonitors();
+    JobsPlugin.updateJobPoolMonitors();
     startWiqMonitor();
-    
+
     final Promise<V> smartFuture = new Promise<V>();
     JobsPlugin.executor.submit(getJobCallingCallable(smartFuture));
     return smartFuture;
   }
 
-  static void updateJobPoolMonitors() {
-    MonitorFactory.getMonitor(JOB_EXECUTOR_QUEUE_MONITOR_HKEY, "elmts.")       .add(JobsPlugin.executor.getQueue().size());
-    MonitorFactory.getMonitor(JOB_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY, "elmts.").add(JobsPlugin.executor.getActiveCount());
-    MonitorFactory.getMonitor(JOB_EXECUTOR_TASK_COUNT_MONITOR_HKEY, "elmts.")  .add(JobsPlugin.executor.getTaskCount());
-    MonitorFactory.getMonitor(JOB_EXECUTOR_POOL_SIZE_MONITOR_HKEY, "elmts.")   .add(JobsPlugin.executor.getPoolSize());
-  }
+
 
   /**
    * If is called in a 'HttpRequest' invocation context, waits until request
@@ -146,7 +134,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
    */
   public Promise<V> in(int seconds) {
     final Promise<V> smartFuture = new Promise<V>();
-    updateJobPoolMonitors();
+    JobsPlugin.updateJobPoolMonitors();
     waitInQueueMonitor = MonitorFactory.start("JOB_WIQ_"+composeEffHkey()+"_in_sec_"+seconds);
     JobsPlugin.executor.schedule(getJobCallingCallable(smartFuture), seconds, TimeUnit.SECONDS);
     return smartFuture;
@@ -182,7 +170,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
    * Run this job every n seconds
    */
   public void every(int seconds) {
-    updateJobPoolMonitors();
+    JobsPlugin.updateJobPoolMonitors();
     waitInQueueMonitor = MonitorFactory.start("JOB_WIQ_"+composeEffHkey()+"_every_sec_"+seconds);
     JobsPlugin.executor.scheduleWithFixedDelay(this, seconds, seconds, TimeUnit.SECONDS);
   }
@@ -213,7 +201,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   }
 
   public V call() {
-//    if(waitInQueueMonitor!=null)
+    if(waitInQueueMonitor!=null)
     {
       waitInQueueMonitor.stop();
       waitInQueueMonitor=null;
@@ -273,9 +261,6 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   public void startWiqMonitor() {
     waitInQueueMonitor=MonitorFactory.start("JOB_WIQ_"+composeEffHkey());
   }
-//  public Monitor stopWiqMonitor() {
-//    return waitInQueueMonitor.stop();
-//  }
 
   @Override
   public String toString() {
