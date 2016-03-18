@@ -1,6 +1,5 @@
 package play.db.jpa;
 
-import org.hibernate.Session;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.collection.internal.PersistentMap;
 import org.hibernate.engine.spi.*;
@@ -12,12 +11,16 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
 
+import play.InternalCache;
+import play.Play;
 import play.PlayPlugin;
+import play.db.DBConfig;
 import play.exceptions.UnexpectedException;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
@@ -28,7 +31,6 @@ import java.util.*;
  */
 @MappedSuperclass
 public class JPABase implements Serializable, play.db.Model {
-    
     private transient JPAConfig _jpaConfig = null;
 
     public JPAContext getJPAContext() {
@@ -43,6 +45,45 @@ public class JPABase implements Serializable, play.db.Model {
      */
     public static JPAConfig getJPAConfig(Class clazz) {
         return JPA.getJPAConfig( Entity2JPAConfigResolver.getJPAConfigNameForEntityClass(clazz));
+    }
+
+    public void _batchSave() {
+        getJPAContext().increaseBatch();
+        String configName = getJPAConfig(this.getClass()).getConfigName();
+        if (DBConfig.defaultDbConfigName.equalsIgnoreCase(configName)) {
+            configName = "db";
+        }
+        int batchSize = 1;
+        try {
+            batchSize = Integer.valueOf(Play.configuration.getProperty(configName + ".hibernate.jdbc.batch.size"));
+            if (batchSize < 1) {
+                batchSize = 1;
+            }
+        } catch (NumberFormatException e) {
+        }
+        if (!em().contains(this)) {
+            em().persist(this);
+            PlayPlugin.postEvent("JPASupport.objectPersisted", this);
+        }
+        avoidCascadeSaveLoops.set(new HashSet<JPABase>());
+        try {
+            saveAndCascade(true);
+        } finally {
+            avoidCascadeSaveLoops.get().clear();
+        }
+        try {
+            if (getJPAContext().getBatchCount() % batchSize == 0) {
+                em().flush();
+                em().clear();
+            }
+        } catch (PersistenceException e) {
+            if (e.getCause() instanceof GenericJDBCException) {
+                throw new PersistenceException(((GenericJDBCException) e.getCause()).getSQL(), e);
+            } else {
+                throw e;
+            }
+        }
+        avoidCascadeSaveLoops.set(new HashSet<JPABase>());
     }
 
     public void _save() {
@@ -137,17 +178,35 @@ public class JPABase implements Serializable, play.db.Model {
                     continue;
                 }
                 boolean doCascade = false;
-                if (field.isAnnotationPresent(OneToOne.class)) {
-                    doCascade = cascadeAll(field.getAnnotation(OneToOne.class).cascade());
-                }
-                if (field.isAnnotationPresent(OneToMany.class)) {
-                    doCascade = cascadeAll(field.getAnnotation(OneToMany.class).cascade());
-                }
-                if (field.isAnnotationPresent(ManyToOne.class)) {
-                    doCascade = cascadeAll(field.getAnnotation(ManyToOne.class).cascade());
-                }
-                if (field.isAnnotationPresent(ManyToMany.class)) {
-                    doCascade = cascadeAll(field.getAnnotation(ManyToMany.class).cascade());
+                //TODO: add cache for field->isPresent(X)
+//                Annotation annotation = InternalCache.getAnnotation(OneToOne.class, field);
+//                boolean isAnnotationPresent=InternalCache.isAnnotationPresent(OneToOne.class, field);
+                if(InternalCache.isEnableAnnotationPresent()){
+                    if (InternalCache.isAnnotationPresent(OneToOne.class,field)) {
+                        doCascade = cascadeAll(((OneToOne)InternalCache.getAnnotation(OneToOne.class,field)).cascade());
+                    }
+                    if (InternalCache.isAnnotationPresent(OneToMany.class,field)) {
+                        doCascade = cascadeAll(((OneToMany)InternalCache.getAnnotation(OneToMany.class,field)).cascade());
+                    }
+                    if (InternalCache.isAnnotationPresent(ManyToOne.class,field)) {
+                        doCascade = cascadeAll(((ManyToOne)InternalCache.getAnnotation(ManyToOne.class,field)).cascade());
+                    }
+                    if (InternalCache.isAnnotationPresent(ManyToMany.class,field)) {
+                        doCascade = cascadeAll(((ManyToMany)InternalCache.getAnnotation(ManyToMany.class,field)).cascade());
+                    }
+                }else {
+                    if (field.isAnnotationPresent(OneToOne.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(OneToOne.class).cascade());
+                    }
+                    if (field.isAnnotationPresent(OneToMany.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(OneToMany.class).cascade());
+                    }
+                    if (field.isAnnotationPresent(ManyToOne.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(ManyToOne.class).cascade());
+                    }
+                    if (field.isAnnotationPresent(ManyToMany.class)) {
+                        doCascade = cascadeAll(field.getAnnotation(ManyToMany.class).cascade());
+                    }
                 }
                 if (doCascade) {
                     Object value = field.get(this);
