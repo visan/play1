@@ -287,7 +287,7 @@ public class CorePlugin extends PlayPlugin {
     @Override
     public void enhance(ApplicationClass applicationClass) throws Exception {
         Class<?>[] enhancers = new Class[]{
-//            PropertiesEnhancer.class,
+            PropertiesEnhancer.class,
             ContinuationEnhancer.class,
 //            SigEnhancer.class,
             //ControllersEnhancer.class,
