@@ -296,7 +296,7 @@ public class DBConfig {
                     ds.setAcquireIncrement(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireIncrement", "3")));//acquireIncrement
                     ds.setAcquireRetryAttempts(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryAttempts", "10")));//acquireRetryAttempts
                     ds.setAcquireRetryDelay(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryDelay", "1000")));//acquireRetryDelay
-                    ds.setAcquireRetryDelay(Integer.parseInt(p.getProperty(propsPrefix + ".pool.initialPoolSize", "3")));//initialPoolSize
+                    ds.setInitialPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.initialPoolSize", "3")));//initialPoolSize
 
 
                     ds.setCheckoutTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.timeout", "5000")));//checkoutTimeout
