@@ -1,7 +1,6 @@
 package play.db;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.ConnectionCustomizer;
+import com.mchange.v2.c3p0.*;
 import com.sun.rowset.CachedRowSetImpl;
 
 import jregex.Matcher;
@@ -38,27 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import javax.sql.RowSet;
-import javax.sql.rowset.CachedRowSet;
-
-import jregex.Matcher;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.internal.SessionImpl;
-
-import play.Logger;
-import play.Play;
-import play.db.jpa.JPA;
-import play.db.jpa.JPAConfig;
-import play.db.jpa.JPAContext;
-import play.exceptions.DatabaseException;
-
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.ConnectionCustomizer;
-import com.sun.rowset.CachedRowSetImpl;
 
 public class DBConfig {
 
@@ -308,19 +288,62 @@ public class DBConfig {
                         }
                     }
 
-                    ComboPooledDataSource ds = new ComboPooledDataSource();
-                    ds.setDriverClass(p.getProperty(propsPrefix+".driver"));
-                    ds.setJdbcUrl(p.getProperty(propsPrefix + ".url"));
-                    ds.setUser(p.getProperty(propsPrefix + ".user"));
-                    ds.setPassword(p.getProperty(propsPrefix + ".pass"));
-                    ds.setAcquireRetryAttempts(10);
-                    ds.setCheckoutTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.timeout", "5000")));
-                    ds.setBreakAfterAcquireFailure(false);
-                    ds.setMaxPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxSize", "30")));
-                    ds.setMinPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.minSize", "1")));
-                    ds.setMaxIdleTimeExcessConnections(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxIdleTimeExcessConnections", "0")));
-                    ds.setIdleConnectionTestPeriod(10);
-                    ds.setTestConnectionOnCheckin(true);
+                    ComboPooledDataSource ds = new ComboPooledDataSource(false);
+                    ds.setDriverClass(p.getProperty(propsPrefix + ".driver"));//driverClass
+                    ds.setJdbcUrl(p.getProperty(propsPrefix + ".url"));//jdbcUrl
+                    ds.setUser(p.getProperty(propsPrefix + ".user"));//user
+                    ds.setPassword(p.getProperty(propsPrefix + ".pass"));//password
+                    ds.setAcquireIncrement(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireIncrement", "3")));//acquireIncrement
+                    ds.setAcquireRetryAttempts(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryAttempts", "10")));//acquireRetryAttempts
+                    ds.setAcquireRetryDelay(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryDelay", "1000")));//acquireRetryDelay
+
+                    ds.setCheckoutTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.timeout", "5000")));//checkoutTimeout
+                    ds.setBreakAfterAcquireFailure(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.breakAfterAcquireFailure", "false")));//breakAfterAcquireFailure
+                    ds.setMaxPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxSize", "30")));//maxPoolSize
+                    ds.setMinPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.minSize", "1")));//minPoolSize
+                    ds.setMaxIdleTimeExcessConnections(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxIdleTimeExcessConnections", "0")));//maxIdleTimeExcessConnections
+                    ds.setIdleConnectionTestPeriod(Integer.parseInt(p.getProperty(propsPrefix + ".pool.idleConnectionTestPeriod", "0")));//idleConnectionTestPeriod
+                    ds.setTestConnectionOnCheckin(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.testConnectionOnCheckin", "true")));//testConnectionOnCheckin
+                  ds.setAutoCommitOnClose(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.autoCommitOnClose", "false")));//autoCommitOnClose
+                  ds.setPreferredTestQuery(p.getProperty(propsPrefix + ".pool.preferredTestQuery", null));//preferredTestQuery
+                  ds.setUnreturnedConnectionTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.unreturnedConnectionTimeout", "0")));//unreturnedConnectionTimeout
+                  ds.setDebugUnreturnedConnectionStackTraces(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.debugUnreturnedConnectionStackTraces", "false")));//debugUnreturnedConnectionStackTraces
+                  ds.setTestConnectionOnCheckout(Boolean.valueOf(p.getProperty(propsPrefix + ".pool.testConnectionOnCheckout", "false")));//testConnectionOnCheckout
+                  ds.setMaxStatements(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxStatements", "0")));//maxStatements
+                  ds.setMaxStatementsPerConnection(Integer.parseInt(p.getProperty(propsPrefix + ".pool.maxStatementsPerConnection", "0")));//maxStatementsPerConnection
+                  ds.setConnectionCustomizerClassName(PoolConnectionCustomizerProxy.class.getName());//connectionCustomizerClassName
+/*
+
+automaticTestTable
+
+connectionTesterClassName
+contextClassLoaderSource
+
+extensions
+factoryClassLocation
+forceIgnoreUnresolvedTransactions
+forceUseNamedDriverClass
+initialPoolSize
+maxAdministrativeTaskTime
+maxConnectionAge
+maxIdleTime
+
+
+numHelperThreads
+overrideDefaultUser
+overrideDefaultPassword
+
+privilegeSpawnedThreads
+propertyCycle
+statementCacheNumDeferredCloseThreads
+
+
+usesTraditionalReflectiveProxies
+
+ */
+                  ds.setIdentityToken(propsPrefix);
+//                    ds.setDataSourceName(propsPrefix);//dataSourceName
+                    C3P0Registry.reregister(ds);
 
                     if (p.getProperty(propsPrefix+".testquery") != null) {
 			    ds.setPreferredTestQuery(p.getProperty(propsPrefix+".testquery"));
@@ -335,23 +358,24 @@ public class DBConfig {
                             ds.setPreferredTestQuery("/* ping */ SELECT 1");
                         }
                     }
-
-                    // This check is not required, but here to make it clear that nothing changes for people
-                    // that don't set this configuration property. It may be safely removed.
-                    if(p.getProperty("db.isolation") != null) {
-                        ds.setConnectionCustomizerClassName(DBConfig.PlayConnectionCustomizer.class.getName());
-                    }
+//removed as we need our own connection customization.
+//                    // This check is not required, but here to make it clear that nothing changes for people
+//                    // that don't set this configuration property. It may be safely removed.
+//                    if(p.getProperty("db.isolation") != null) {
+//                        ds.setConnectionCustomizerClassName(DBConfig.PlayConnectionCustomizer.class.getName());
+//                    }
 
                     datasource = ds;
                     url = ds.getJdbcUrl();
-                    Connection c = null;
-                    try {
-                        c = ds.getConnection();
-                    } finally {
-                        if (c != null) {
-                            c.close();
-                        }
-                    }
+                  //commended in order to decrease aquire timeout to 1 millsec.
+//                    Connection c = null;
+//                    try {
+//                        c = ds.getConnection();
+//                    } finally {
+//                        if (c != null) {
+//                            c.close();
+//                        }
+//                    }
                     Logger.info("Connected to %s", ds.getJdbcUrl());
 
                 }
@@ -624,4 +648,5 @@ public class DBConfig {
             }
         }
     }
+
 }

@@ -225,6 +225,14 @@ public class GenericModel extends JPABase {
     /**
      * store (ie insert) the entity.
      */
+    public <T extends JPABase> T batchSave() {
+        _batchSave();
+        return (T) this;
+    }
+
+    /**
+     * store (ie insert) the entity.
+     */
     public boolean create() {
         if (!em().contains(this)) {
             _save();

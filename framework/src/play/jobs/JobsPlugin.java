@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
+import com.jamonapi.MonitorFactory;
 import play.Logger;
 import play.Play;
 import play.PlayPlugin;
@@ -113,6 +114,7 @@ public class JobsPlugin extends PlayPlugin {
                     try {
                         Job<?> job = ((Job<?>) clazz.newInstance());
                         scheduledJobs.add(job);
+                        job.startWiqMonitor();
                         job.run();
                         if(job.wasError) {
                             if(job.lastException != null) {
@@ -138,6 +140,7 @@ public class JobsPlugin extends PlayPlugin {
                         //start running job now in the background
                         @SuppressWarnings("unchecked")
                         Callable<Job> callable = (Callable<Job>)job;
+                        job.startWiqMonitor();
                         executor.submit(callable);
                     } catch (InstantiationException ex) {
                         throw new UnexpectedException("Cannot instanciate Job " + clazz.getName());
@@ -170,6 +173,7 @@ public class JobsPlugin extends PlayPlugin {
                     }
                     value = Expression.evaluate(value, value).toString();
                     if(!"never".equalsIgnoreCase(value)){
+                        job.startWiqMonitor();
                         executor.scheduleWithFixedDelay(job, Time.parseDuration(value), Time.parseDuration(value), TimeUnit.SECONDS);
                     }
                 } catch (InstantiationException ex) {
@@ -184,7 +188,7 @@ public class JobsPlugin extends PlayPlugin {
     @Override
     public void onApplicationStart() {
         int core = Integer.parseInt(Play.configuration.getProperty("play.jobs.pool", "10"));
-        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("jobs"), new ThreadPoolExecutor.AbortPolicy());
+        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("jb"), new ThreadPoolExecutor.AbortPolicy());
     }
 
     public static <V> void scheduleForCRON(Job<V> job) {
@@ -216,6 +220,8 @@ public class JobsPlugin extends PlayPlugin {
                 nextDate = cronExp.getNextValidTimeAfter(nextInvalid);
             }
             job.nextPlannedExecution = nextDate;
+            job.startWiqMonitor();
+            updateJobPoolMonitors();
             executor.schedule((Callable<V>)job, nextDate.getTime() - now.getTime(), TimeUnit.MILLISECONDS);
             job.executor = executor;
         } catch (Exception ex) {
@@ -223,6 +229,17 @@ public class JobsPlugin extends PlayPlugin {
         }
     }
 
+    public static final String JOB_EXECUTOR_QUEUE_MONITOR_HKEY =        "JOB_POOL_QUEUE";
+    public static final String JOB_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY = "JOB_POOL_ACTIVE_COUNT";
+    public static final String JOB_EXECUTOR_TASK_COUNT_MONITOR_HKEY =   "JOB_POOL_TASK_COUNT";
+    public static final String JOB_EXECUTOR_POOL_SIZE_MONITOR_HKEY =    "JOB_POOL_POOL_SIZE";
+
+    public static void updateJobPoolMonitors() {
+        MonitorFactory.getMonitor(JOB_EXECUTOR_QUEUE_MONITOR_HKEY, "elmts.")       .add(JobsPlugin.executor.getQueue().size());
+        MonitorFactory.getMonitor(JOB_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY, "elmts.").add(JobsPlugin.executor.getActiveCount());
+        MonitorFactory.getMonitor(JOB_EXECUTOR_TASK_COUNT_MONITOR_HKEY, "elmts.")  .add(JobsPlugin.executor.getTaskCount());
+        MonitorFactory.getMonitor(JOB_EXECUTOR_POOL_SIZE_MONITOR_HKEY, "elmts.")   .add(JobsPlugin.executor.getPoolSize());
+    }
     @Override
     public void onApplicationStop() {
 

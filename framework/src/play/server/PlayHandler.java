@@ -7,9 +7,13 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.frame.TooLongFrameException;
 import org.jboss.netty.handler.codec.http.*;
-import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+import org.jboss.netty.handler.codec.http.websocketx.*;
 import org.jboss.netty.handler.stream.ChunkedInput;
 import org.jboss.netty.handler.stream.ChunkedStream;
+import org.jboss.netty.handler.stream.ChunkedWriteHandler;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import play.Invoker;
 import play.Invoker.InvocationContext;
 import play.Logger;
@@ -71,6 +75,8 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent messageEvent) throws Exception {
+        long startTs = System.currentTimeMillis();
+        log.trace("message: begin");
         if (Logger.isTraceEnabled()) {
             Logger.trace("messageReceived: begin");
         }
@@ -117,9 +123,12 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
         if (Logger.isTraceEnabled()) {
             Logger.trace("messageReceived: end");
         }
+        long duration=System.currentTimeMillis()-startTs;
+        log.trace("message: end. (Took {} ms.)",duration);
     }
 
     private static final Map<String, RenderStatic> staticPathsCache = new HashMap<String, RenderStatic>();
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(PlayHandler.class.getName());
 
     public class NettyInvocation extends Invoker.Invocation {
 
@@ -179,6 +188,9 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
 
         @Override
         public void run() {
+            MDC.put(Invoker.Invocation.IVK,this.getInvocationId());
+            long startTs = System.currentTimeMillis();
+            log.trace("begin");
             try {
                 if (Logger.isTraceEnabled()) {
                     Logger.trace("run: begin");
@@ -190,6 +202,9 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
             if (Logger.isTraceEnabled()) {
                 Logger.trace("run: end");
             }
+            long duration=System.currentTimeMillis()-startTs;
+            log.trace("end. (Took {} ms.)",duration);
+            MDC.remove(Invoker.Invocation.IVK);
         }
 
         @Override
@@ -246,10 +261,15 @@ public class PlayHandler extends SimpleChannelUpstreamHandler {
 //            setContentLength(nettyResponse, response.out.size());
         }
 
-        ChannelFuture f = ctx.getChannel().write(nettyResponse);
+        ChannelFuture f = null;
+        if (ctx.getChannel().isOpen()) {
+            f = ctx.getChannel().write(nettyResponse);
+        } else {
+            Logger.error("Try to write on a closed channel[keepAlive:%s]", keepAlive);
+        }
 
         // Decide whether to close the connection or not.
-        if (!keepAlive) {
+        if (f != null && !keepAlive) {
             // Close the connection when the whole content is written out.
             f.addListener(ChannelFutureListener.CLOSE);
         }

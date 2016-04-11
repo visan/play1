@@ -29,13 +29,13 @@ public class ApplicationClassesCompilerWorkspace implements CompilerWorkspace {
 
   @Override
   public byte[] getJavaByteCode(String name) {
-    System.out.println("gjbc: " + name + " " + (applicationClasses.getApplicationClass(name).javaByteCode == null ? "null" : "[bytes]"));
+//    System.out.println("gjbc: " + name + " " + (applicationClasses.getApplicationClass(name).javaByteCode == null ? "null" : "[bytes]"));
     return applicationClasses.getApplicationClass(name).javaByteCode;
   }
 
   @Override
   public void setCompiledBytes(String name, byte[] bytes) {
-    System.out.println("scby: " + name);
+//    System.out.println("scby: " + name);
     applicationClasses.getApplicationClass(name).compiled(bytes);
   }
 }

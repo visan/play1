@@ -8,6 +8,7 @@ import com.jamonapi.utils.Misc;
 import org.apache.commons.lang.StringUtils;
 import play.classloading.ApplicationClasses.ApplicationClass;
 import play.classloading.enhancers.Enhancer;
+import play.classloading.enhancers.PropertiesEnhancer;
 import play.exceptions.UnexpectedException;
 import play.mvc.Http.Request;
 import play.mvc.Http.Response;
@@ -279,13 +280,11 @@ public class CorePlugin extends PlayPlugin {
     @Override
     public void enhance(ApplicationClass applicationClass) throws Exception {
         Class<?>[] enhancers = new Class[]{
-//            PropertiesEnhancer.class,
-
-//                ContinuationEnhancer.class,
+            PropertiesEnhancer.class,
+//            ContinuationEnhancer.class,
                 RxContinuationEnhancer.class,
-
 //            SigEnhancer.class,
-                //ControllersEnhancer.class,
+            //ControllersEnhancer.class,
 //            MailerEnhancer.class,
 //            LVEnhancer.class
         };

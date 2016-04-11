@@ -2,6 +2,7 @@
 
 <project name="play! framework" default="jar" basedir=".">
 
+    <property name="version" value="visan" />
     <property name="baseversion" value="master" />
     <property name="version" value="visan-soa" />
 
@@ -403,7 +404,7 @@
     <target name="package" depends="clean,version,jar">
         <mkdir dir="dist" /> 
         <zip destfile="dist/play-${version}.zip" comment="Play! ${version}" update="false">
-            <zipfileset prefix="play-${version}" dir=".." includes="**/*" excludes="**/cobertura.ser,**/*.pyc,hs_err*,.*,.*/*,framework/dist/**,id,play,nbproject/**,**/.bzr/**,**/.git/**,*.bzrignore,support/textmate/**,framework/classes/**,framework/tests-results/**,samples-and-tests/**,modules/**,.idea/**,documentation/**,lib_ant/**,out/**,samples-and-tests/**,support/**" />
+            <zipfileset prefix="play-${version}" dir=".." includes="**/*" excludes="**/cobertura.ser,**/*.pyc,hs_err*,.*,.*/*,framework/lib-bak/**,framework/lib-test/**,framework/out/**,framework/dist/**,id,play,nbproject/**,**/.bzr/**,**/.git/**,*.bzrignore,support/textmate/**,framework/classes/**,framework/tests-results/**,samples-and-tests/**,modules/**,.idea/**,documentation/**,lib_ant/**,out/**,samples-and-tests/**,support/**" />
             <zipfileset prefix="play-${version}" dir=".." includes="play" filemode="777"/>
             <zipfileset prefix="play-${version}" dir=".." includes="modules/grizzly/**,modules/crud/**,modules/secure/**,modules/docviewer/**,modules/testrunner/**" excludes="**/*.pyc" />
         </zip>
