@@ -8,6 +8,7 @@ import org.hibernate.EmptyInterceptor;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.type.Type;
+import play.InternalCache;
 import play.Logger;
 import play.Play;
 import play.PlayPlugin;
@@ -295,7 +296,13 @@ public class JPAPlugin extends PlayPlugin {
 
 
     public static String getDefaultDialect(String propPrefix, String driver) {
-        String dialect = Play.configuration.getProperty(propPrefix + "jpa.dialect");
+        String dialect =null;
+      if(propPrefix.isEmpty()){
+        dialect=Play.configuration.getProperty("db.jpa.dialect");
+      }else {
+        propPrefix = StringUtils.remove(propPrefix,'.');
+        dialect = Play.configuration.getProperty(propPrefix + ".jpa.dialect");
+      }
         if (dialect != null) {
             return dialect;
         } else if ("org.h2.Driver".equals(driver)) {
@@ -717,9 +724,17 @@ public class JPAPlugin extends PlayPlugin {
                 List<Field> fields = new ArrayList<Field>();
                 while (!c.equals(Object.class)) {
                     for (Field field : c.getDeclaredFields()) {
-                        if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(EmbeddedId.class)) {
-                            field.setAccessible(true);
-                            fields.add(field);
+                        //TODO: add cashe field->isAnnotationPresent
+                        if(InternalCache.isEnableAnnotationPresent()) {
+                            if (InternalCache.isAnnotationPresent(Id.class, field) || InternalCache.isAnnotationPresent(EmbeddedId.class, field)) {
+                                field.setAccessible(true);
+                                fields.add(field);
+                            }
+                        }else {
+                            if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(EmbeddedId.class)) {
+                                field.setAccessible(true);
+                                fields.add(field);
+                            }
                         }
                     }
                     c = c.getSuperclass();

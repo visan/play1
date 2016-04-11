@@ -308,10 +308,13 @@ public class Play {
         // Load the templates from the framework after the one from the modules
         templatesPath.add(VirtualFile.open(new File(frameworkPath, "framework/templates")));
 
+        long start = System.currentTimeMillis();
+        Logger.info("Instantiate classloader...");
         // Enable a first classloader
         classloader = new ApplicationClassloader();
+        Logger.info("Done. Instantiated classloader. Took %s msec.", System.currentTimeMillis()-start);
 
-        // Fix ctxPath
+      // Fix ctxPath
         if ("/".equals(Play.ctxPath)) {
             Play.ctxPath = "";
         }
@@ -325,16 +328,22 @@ public class Play {
         // Plugins
         pluginCollection.loadPlugins();
 
+      try {
         // Done !
         if (mode == Mode.PROD) {
-            if (preCompile() && System.getProperty("precompile") == null) {
-                start();
-            } else {
-                return;
-            }
+          if (preCompile() && System.getProperty("precompile") == null) {
+            start();
+          } else {
+            return;
+          }
         } else {
-            Logger.warn("You're running Play! in DEV mode");
+          Logger.warn("You're running Play! in DEV mode");
         }
+      }catch (Exception e){  //fail to start.
+        started=true;//set back true to unblock stop method body.
+        stop();
+        throw new RuntimeException(e);
+      }
 
         // Plugins
         pluginCollection.onApplicationReady();
@@ -592,6 +601,7 @@ public class Play {
                 Cache.stop();
             } catch (Exception ignored) {
             }
+          Logger.error(e,"Unexpected error. Play app is NOT started.");
             throw e;
         } catch (Exception e) {
             started = false;
@@ -599,6 +609,7 @@ public class Play {
                 Cache.stop();
             } catch (Exception ignored) {
             }
+          Logger.error(e,"Unexpected error. Play app is NOT started.");
             throw new UnexpectedException(e);
         }
     }
@@ -638,17 +649,13 @@ public class Play {
             long start = System.currentTimeMillis();
             classloader.getAllClasses();
 
-            if (Logger.isTraceEnabled()) {
-                Logger.trace("%sms to precompile the Java stuff", System.currentTimeMillis() - start);
-            }
+            Logger.info("%sms to precompile the Java stuff", System.currentTimeMillis() - start);
 
             if (!lazyLoadTemplates) {
                 start = System.currentTimeMillis();
 //                TemplateLoader.getAllTemplate();
 
-                if (Logger.isTraceEnabled()) {
-                    Logger.trace("%sms to precompile the templates", System.currentTimeMillis() - start);
-                }
+                Logger.info("%sms to precompile the templates", System.currentTimeMillis() - start);
             }
             return true;
         } catch (Throwable e) {
@@ -737,6 +744,8 @@ public class Play {
      * @param appRoot : the application path virtual file
      */
     public static void loadModules(VirtualFile appRoot) {
+        Logger.info("Loading modules...");
+        long start=System.currentTimeMillis();
         if (System.getenv("MODULES") != null) {
             // Modules path is prepended with a env property
             if (System.getenv("MODULES") != null && System.getenv("MODULES").trim().length() > 0) {
@@ -797,7 +806,8 @@ public class Play {
 					}
 				}
 			}
-		}
+      Logger.info("Loaded modules. Took %s msec.",System.currentTimeMillis()-start);
+    }
 
 //        // Auto add special modules
 //        if (Play.runningInTestMode()) {

@@ -150,6 +150,7 @@ public class Server {
     }
 
     public static void main(String[] args) throws Exception {
+//      poligon();
         File root = new File(System.getProperty("application.path"));
         if (System.getProperty("precompiled", "false").equals("true")) {
             Play.usePrecompiled = true;
@@ -164,5 +165,14 @@ public class Server {
             Logger.info("Done.");
         }
     }
+
+  private static void poligon() {
+    try {
+      Class aClass=Class.forName("trans.Payment$ReqFormEvent");
+      System.out.println(aClass);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }
