@@ -23,13 +23,15 @@ public class ContinuationEnhancer extends Enhancer {
     static {
 //        continuationMethods.add("play.mvc.Controller.await(java.lang.String)");
 //        continuationMethods.add("play.mvc.Controller.await(int)");
+
         continuationMethods.add("play.mvc.Controller.await(java.util.concurrent.Future)");
-        continuationMethods.add("play.mvc.Controller.awaitProto(com.google.protobuf.MessageLite, java.util.concurrent.Future)");
+//        continuationMethods.add("play.mvc.Controller.awaitProto(com.google.protobuf.MessageLite, java.util.concurrent.Future)");
+
 //        continuationMethods.add("play.mvc.WebSocketController.await(java.lang.String)");
 //        continuationMethods.add("play.mvc.WebSocketController.await(int)");
 //        continuationMethods.add("play.mvc.WebSocketController.await(java.util.concurrent.Future)");
 
-        continuationMethods.add("play.mvc.Rx.await(java.util.concurrent.Future)");
+//        continuationMethods.add("play.mvc.Rx.await(java.util.concurrent.Future)");
     }
 
     public static boolean isEnhanced(String appClassName) {

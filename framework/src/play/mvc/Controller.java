@@ -289,7 +289,9 @@ public class Controller implements ControllerSupport {
     private final static Map<Integer, Future> futureMap = new ConcurrentHashMap<Integer, Future>();
 
     @SuppressWarnings("unchecked")
-    protected static <T> T awaitProto(com.google.protobuf.MessageLite reqMsg, Future<T> future) {
+    public static <T> T awaitProto(Future<T> future) {
+        if(1==1) return null;
+        com.google.protobuf.MessageLite reqMsg=Proto.getLocalThreadRequest();
 
         if(future != null) {
             futureMap.put(reqMsg.hashCode(), future);
@@ -310,6 +312,7 @@ public class Controller implements ControllerSupport {
 
         if(future.isDone()) {
             try {
+                futureMap.remove(reqMsg.hashCode());
                 return future.get();
             } catch(Exception e) {
                 throw new UnexpectedException(e);
