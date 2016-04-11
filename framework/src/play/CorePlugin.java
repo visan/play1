@@ -8,6 +8,7 @@ import com.jamonapi.utils.Misc;
 import org.apache.commons.lang.StringUtils;
 import play.classloading.ApplicationClasses.ApplicationClass;
 import play.classloading.enhancers.Enhancer;
+import play.classloading.enhancers.PropertiesEnhancer;
 import play.exceptions.UnexpectedException;
 import play.mvc.Http.Request;
 import play.mvc.Http.Response;
