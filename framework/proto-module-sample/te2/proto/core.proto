@@ -1,0 +1,10 @@
+package adg;
+
+option java_package = "adg";
+option java_outer_classname = "Core";
+
+message Msg {
+    required int32 id = 2;
+    optional string text = 3;
+    repeated string value= 4;
+}
