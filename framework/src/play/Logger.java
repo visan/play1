@@ -17,8 +17,6 @@ import org.apache.log4j.Priority;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 
-
-import org.slf4j.LoggerFactory;
 import play.exceptions.PlayException;
 
 /**
@@ -42,7 +40,7 @@ public class Logger {
     /**
      * The application logger (play).
      */
-//    public static org.apache.log4j.Logger log4j;
+    public static org.apache.log4j.Logger log4j;
     /**
      * When using java.util.logging.
      */
@@ -51,13 +49,11 @@ public class Logger {
      * true if logger is configured manually (log4j-config file supplied by application)
      */
     public static boolean configuredManually = false;
-    public static org.slf4j.Logger log4j = LoggerFactory.getLogger("play");
 
     /**
      * Try to init stuff.
      */
     public static void init() {
-
         String log4jPath = Play.configuration.getProperty("application.log.path", "/log4j.xml");
         URL log4jConf = Logger.class.getResource(log4jPath);
         boolean isXMLConfig = log4jPath.endsWith(".xml");
@@ -82,7 +78,7 @@ public class Logger {
             } else {
                 PropertyConfigurator.configure(log4jConf);
             }
-            Logger.log4j = LoggerFactory.getLogger("play");
+            Logger.log4j = org.apache.log4j.Logger.getLogger("play");
             // In test mode, append logs to test-result/application.log
             if (Play.runningInTestMode()) {
                 org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
@@ -104,22 +100,22 @@ public class Logger {
      * @param level TRACE,DEBUG,INFO,WARN,ERROR,FATAL
      */
     public static void setUp(String level) {
-//        if (forceJuli || log4j == null) {
-//            Logger.juli.setLevel(toJuliLevel(level));
-//        } else {
-//            Logger.log4j.setLevel(org.apache.log4j.Level.toLevel(level));
-//            if (redirectJuli) {
-//                java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
-//                for (Handler handler : rootLogger.getHandlers()) {
-//                    rootLogger.removeHandler(handler);
-//                }
-//                Handler activeHandler = new JuliToLog4jHandler();
-//                java.util.logging.Level juliLevel = toJuliLevel(level);
-//                activeHandler.setLevel(juliLevel);
-//                rootLogger.addHandler(activeHandler);
-//                rootLogger.setLevel(juliLevel);
-//            }
-//        }
+        if (forceJuli || log4j == null) {
+            Logger.juli.setLevel(toJuliLevel(level));
+        } else {
+            Logger.log4j.setLevel(org.apache.log4j.Level.toLevel(level));
+            if (redirectJuli) {
+                java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
+                for (Handler handler : rootLogger.getHandlers()) {
+                    rootLogger.removeHandler(handler);
+                }
+                Handler activeHandler = new JuliToLog4jHandler();
+                java.util.logging.Level juliLevel = toJuliLevel(level);
+                activeHandler.setLevel(juliLevel);
+                rootLogger.addHandler(activeHandler);
+                rootLogger.setLevel(juliLevel);
+            }
+        }
     }
 
     /**
@@ -189,16 +185,15 @@ public class Logger {
     * @return true if specified logging-level is enabled
     */
    public static boolean isEnabledFor(org.apache.log4j.Level log4jLevel) {
-//       if (forceJuli || log4j == null) {
-//           //must translate from log4j-level to jul-level
-//           java.util.logging.Level julLevel = toJuliLevel(log4jLevel.toString());
-//           //check level against jul
-//           return juli.isLoggable(julLevel);
-//       } else {
-//           //check level against log4j
-//           return log4j.isEnabledFor(log4jLevel);
-//       }
-     return true;
+       if (forceJuli || log4j == null) {
+           //must translate from log4j-level to jul-level
+           java.util.logging.Level julLevel = toJuliLevel(log4jLevel.toString());
+           //check level against jul
+           return juli.isLoggable(julLevel);
+       } else {
+           //check level against log4j
+           return log4j.isEnabledFor(log4jLevel);
+       }
    }
    
 
@@ -208,25 +203,25 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void trace(String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.TRACE)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    juli.finest(format(message, args));
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (recordCaller) {
-//                        org.apache.log4j.Logger.getLogger(getCallerClassName()).trace(format(message, args));
-//                    } else {
+        if (isEnabledFor(org.apache.log4j.Level.TRACE)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    juli.finest(format(message, args));
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (recordCaller) {
+                        org.apache.log4j.Logger.getLogger(getCallerClassName()).trace(format(message, args));
+                    } else {
                         log4j.trace(format(message, args));
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -294,28 +289,28 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void info(String message, Object... args) {
-//        if(isEnabledFor(org.apache.log4j.Level.INFO)){
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    juli.info(format(message, args));
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (recordCaller) {
-//                        // TODO: It is expensive to extract caller-info
-//                        // we should only do it if we know the message is being
-//                        // logged (level)
-//                        org.apache.log4j.Logger.getLogger(getCallerClassName()).info(format(message, args));
-//                    } else {
+        if(isEnabledFor(org.apache.log4j.Level.INFO)){
+            if (forceJuli || log4j == null) {
+                try {
+                    juli.info(format(message, args));
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (recordCaller) {
+                        // TODO: It is expensive to extract caller-info
+                        // we should only do it if we know the message is being
+                        // logged (level)
+                        org.apache.log4j.Logger.getLogger(getCallerClassName()).info(format(message, args));
+                    } else {
                         log4j.info(format(message, args));
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -325,29 +320,29 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void info(Throwable e, String message, Object... args) {
-//        if(isEnabledFor(org.apache.log4j.Level.INFO)){
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.INFO, e, message, args)) {
-//                        juli.log(Level.INFO, format(message, args), e);
-//                    }
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.INFO, e, message, args)) {
-//                        if (recordCaller) {
-//                            org.apache.log4j.Logger.getLogger(getCallerClassName()).info(format(message, args), e);
-//                        } else {
+        if(isEnabledFor(org.apache.log4j.Level.INFO)){
+            if (forceJuli || log4j == null) {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.INFO, e, message, args)) {
+                        juli.log(Level.INFO, format(message, args), e);
+                    }
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.INFO, e, message, args)) {
+                        if (recordCaller) {
+                            org.apache.log4j.Logger.getLogger(getCallerClassName()).info(format(message, args), e);
+                        } else {
                             log4j.info(format(message, args), e);
-//                        }
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -356,25 +351,25 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void warn(String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.WARN)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    juli.warning(format(message, args));
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (recordCaller) {
-//                        org.apache.log4j.Logger.getLogger(getCallerClassName()).warn(format(message, args));
-//                    } else {
+        if (isEnabledFor(org.apache.log4j.Level.WARN)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    juli.warning(format(message, args));
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (recordCaller) {
+                        org.apache.log4j.Logger.getLogger(getCallerClassName()).warn(format(message, args));
+                    } else {
                         log4j.warn(format(message, args));
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -384,29 +379,29 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void warn(Throwable e, String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.WARN)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.WARN, e, message, args)) {
-//                        juli.log(Level.WARNING, format(message, args), e);
-//                    }
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.WARN, e, message, args)) {
-//                        if (recordCaller) {
-//                            org.apache.log4j.Logger.getLogger(getCallerClassName()).warn(format(message, args), e);
-//                        } else {
+        if (isEnabledFor(org.apache.log4j.Level.WARN)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.WARN, e, message, args)) {
+                        juli.log(Level.WARNING, format(message, args), e);
+                    }
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.WARN, e, message, args)) {
+                        if (recordCaller) {
+                            org.apache.log4j.Logger.getLogger(getCallerClassName()).warn(format(message, args), e);
+                        } else {
                             log4j.warn(format(message, args), e);
-//                        }
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -415,25 +410,25 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void error(String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.ERROR)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    juli.severe(format(message, args));
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (recordCaller) {
-//                        org.apache.log4j.Logger.getLogger(getCallerClassName()).error(format(message, args));
-//                    } else {
+        if (isEnabledFor(org.apache.log4j.Level.ERROR)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    juli.severe(format(message, args));
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (recordCaller) {
+                        org.apache.log4j.Logger.getLogger(getCallerClassName()).error(format(message, args));
+                    } else {
                         log4j.error(format(message, args));
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -443,29 +438,29 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void error(Throwable e, String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.ERROR)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.ERROR, e, message, args)) {
-//                        juli.log(Level.SEVERE, format(message, args), e);
-//                    }
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.ERROR, e, message, args)) {
-//                        if (recordCaller) {
-//                            org.apache.log4j.Logger.getLogger(getCallerClassName()).error(format(message, args), e);
-//                        } else {
+        if (isEnabledFor(org.apache.log4j.Level.ERROR)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.ERROR, e, message, args)) {
+                        juli.log(Level.SEVERE, format(message, args), e);
+                    }
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.ERROR, e, message, args)) {
+                        if (recordCaller) {
+                            org.apache.log4j.Logger.getLogger(getCallerClassName()).error(format(message, args), e);
+                        } else {
                             log4j.error(format(message, args), e);
-//                        }
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+                        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -474,25 +469,25 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void fatal(String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.FATAL)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    juli.severe(format(message, args));
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (recordCaller) {
-//                        org.apache.log4j.Logger.getLogger(getCallerClassName()).fatal(format(message, args));
-//                    } else {
-                        log4j.error(format(message, args));
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+        if (isEnabledFor(org.apache.log4j.Level.FATAL)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    juli.severe(format(message, args));
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (recordCaller) {
+                        org.apache.log4j.Logger.getLogger(getCallerClassName()).fatal(format(message, args));
+                    } else {
+                        log4j.fatal(format(message, args));
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -502,29 +497,29 @@ public class Logger {
      * @param args Pattern arguments
      */
     public static void fatal(Throwable e, String message, Object... args) {
-//        if (isEnabledFor(org.apache.log4j.Level.FATAL)) {
-//            if (forceJuli || log4j == null) {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.FATAL, e, message, args)) {
-//                        juli.log(Level.SEVERE, format(message, args), e);
-//                    }
-//                } catch (Throwable ex) {
-//                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
-//                }
-//            } else {
-//                try {
-//                    if (!niceThrowable(org.apache.log4j.Level.FATAL, e, message, args)) {
-//                        if (recordCaller) {
-//                            org.apache.log4j.Logger.getLogger(getCallerClassName()).fatal(format(message, args), e);
-//                        } else {
-                            log4j.error(format(message, args), e);
-//                        }
-//                    }
-//                } catch (Throwable ex) {
-//                    log4j.error("Oops. Error in Logger !", ex);
-//                }
-//            }
-//        }
+        if (isEnabledFor(org.apache.log4j.Level.FATAL)) {
+            if (forceJuli || log4j == null) {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.FATAL, e, message, args)) {
+                        juli.log(Level.SEVERE, format(message, args), e);
+                    }
+                } catch (Throwable ex) {
+                    juli.log(Level.SEVERE, "Oops. Error in Logger !", ex);
+                }
+            } else {
+                try {
+                    if (!niceThrowable(org.apache.log4j.Level.FATAL, e, message, args)) {
+                        if (recordCaller) {
+                            org.apache.log4j.Logger.getLogger(getCallerClassName()).fatal(format(message, args), e);
+                        } else {
+                            log4j.fatal(format(message, args), e);
+                        }
+                    }
+                } catch (Throwable ex) {
+                    log4j.error("Oops. Error in Logger !", ex);
+                }
+            }
+        }
     }
 
     /**
@@ -605,7 +600,7 @@ public class Logger {
               } else if (recordCaller) {
                 org.apache.log4j.Logger.getLogger(getCallerClassName(5)).log(level, sw.toString(), null);
               } else {
-                log4j.error(sw.toString(), e);
+                log4j.log(level, sw.toString(), e);
               }
             }
             catch (Exception e1) {

@@ -65,8 +65,8 @@ public class JPAEnhancer extends Enhancer {
         ctClass.addMethod(findOneBy);
 
         // create
-//        CtMethod create = CtMethod.make("public static play.db.jpa.JPABase create(String name, play.mvc.Scope.Params params) { return  getJPAConfig("+entityName+".class).jpql.create(\"" + entityName + "\", name, params); }", ctClass);
-//        ctClass.addMethod(create);
+        CtMethod create = CtMethod.make("public static play.db.jpa.JPABase create(String name, play.mvc.Scope.Params params) { return  getJPAConfig("+entityName+".class).jpql.create(\"" + entityName + "\", name, params); }", ctClass);
+        ctClass.addMethod(create);
 
         // Done.
         applicationClass.enhancedByteCode = ctClass.toBytecode();

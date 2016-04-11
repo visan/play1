@@ -12,7 +12,7 @@ public class PThreadFactory implements ThreadFactory {
     public PThreadFactory(String poolName) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        namePrefix = poolName + "-";
+        namePrefix = poolName + "-thread-";
     }
 
     public Thread newThread(Runnable r) {

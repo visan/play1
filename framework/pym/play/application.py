@@ -106,7 +106,7 @@ class PlayApplication(object):
             stModulesEnv = os.environ.get('MODULES')
             arModulesPaths = stModulesEnv.split(";")
             for stModulePath in arModulesPaths:
-                #print(stModulePath)
+                print(stModulePath)
                 mf = os.path.normpath(stModulePath)
                 if os.path.exists(mf):
                     modules.append(mf)
@@ -175,20 +175,6 @@ class PlayApplication(object):
         # The application - add static classes the classpath
         if os.path.exists(os.path.join(self.path, 'classes')):
             classpath.append(os.path.normpath(os.path.join(self.path, 'classes/.')))
-
-        if os.environ.has_key('PCP'):
-            stClassPathsEnv = os.environ.get('PCP')
-            arClassPaths = stClassPathsEnv.split(";")
-            for stClassPath in arClassPaths:
-                #print(stClassPath)
-                #mf = os.path.normpath(os.path.join(stClassPath, '/.'))
-                mf = os.path.normpath(stClassPath)
-                if os.path.exists(mf):
-                    classpath.append(mf)
-                    print "Play class path %s found. Adding..." % mf
-                else:
-                    print "Play class path %s not found. skipping..." % mf
-                    # os_path_separator()
 
         # The modules
         for module in self.modules():
@@ -353,7 +339,6 @@ class PlayApplication(object):
             java_args.append('-Dplay.debug=yes')
         
         java_cmd = [self.java_path(), '-javaagent:%s' % self.agent_path()] + java_args + ['-classpath', cp_args, '-Dapplication.path=%s' % self.path, '-Dplay.id=%s' % self.play_env["id"], className] + args
-        print "java_cmd: %s" % java_cmd
         return java_cmd
 
     # ~~~~~~~~~~~~~~~~~~~~~~ MISC

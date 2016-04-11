@@ -1,8 +1,6 @@
 package play.classloading;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.LoggerFactory;
-import play.InternalCache;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
@@ -26,25 +24,18 @@ import java.security.Permissions;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
- * The application classLoader.
+ * The application classLoader. 
  * Load the classes from the application Java sources files.
  */
 public class ApplicationClassloader extends ClassLoader {
-    public static org.slf4j.Logger log4j = LoggerFactory.getLogger("PlayApplicationClassloader");
-    private static boolean enableClassLoaderCache = false;
 
 
     private final ClassStateHashCreator classStateHashCreator = new ClassStateHashCreator();
-    private final static ConcurrentHashMap<String, Class> classLoaderCache = new ConcurrentHashMap<String, Class>();
 
-    static {
-        enableClassLoaderCache = Boolean.valueOf(System.getProperty("play.enableClassLoaderCache"));
-    }
     /**
      * A representation of the current state of the ApplicationClassloader.
      * It gets a new value each time the state of the classloader changes.
@@ -77,57 +68,27 @@ public class ApplicationClassloader extends ClassLoader {
      * You know ...
      */
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        long start = System.currentTimeMillis();
-        if (enableClassLoaderCache) {
-            if (classLoaderCache.containsKey(name)) {
-                printLogEnd("findInClassLoaderCache", name, resolve, System.currentTimeMillis() - start);
-                return classLoaderCache.get(name);
-            }
-        }
-
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> c = findLoadedClass(name);
         if (c != null) {
-            if (enableClassLoaderCache) {
-                classLoaderCache.put(name, c);
-            }
-            printLogEnd("findLoadedClass", name, resolve, System.currentTimeMillis() - start);
             return c;
         }
 
-        synchronized (classLoaderCache) {
-            // First check if it's an application Class
-            Class<?> applicationClass = loadApplicationClass(name);
-            if (applicationClass != null) {
-                if (resolve) {
-                    resolveClass(applicationClass);
-                }
-                if (enableClassLoaderCache) {
-                    classLoaderCache.put(name, applicationClass);
-                }
-                return applicationClass;
+        // First check if it's an application Class
+        Class<?> applicationClass = loadApplicationClass(name);
+        if (applicationClass != null) {
+            if (resolve) {
+                resolveClass(applicationClass);
             }
+            return applicationClass;
         }
 
         // Delegate to the classic classloader
-        Class<?> aClass = super.loadClass(name, resolve);
-        if (enableClassLoaderCache) {
-            classLoaderCache.put(name, aClass);
-        }
-        printLogEnd("super.loadClass", name, resolve, System.currentTimeMillis() - start);
-        return aClass;
-
-    }
-
-    private static void printLogEnd(String part, String name, boolean resolve, long time) {
-        if (log4j.isTraceEnabled()) {
-            log4j.trace("# end# {}# {}# {}# {}# ms", part, name, resolve, time);
-        }
+        return super.loadClass(name, resolve);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~
     public Class<?> loadApplicationClass(String name) {
-//      System.out.println("loadApplicationClass: "+name);
 
         if (ApplicationClass.isClass(name)) {
             Class maybeAlreadyLoaded = findLoadedClass(name);
@@ -242,9 +203,7 @@ public class ApplicationClassloader extends ClassLoader {
      * Search for the byte code of the given class.
      */
     protected byte[] getClassDefinition(String name) {
-//      System.out.println("getClassDefinition: "+name);
-
-      name = name.replace(".", "/") + ".class";
+        name = name.replace(".", "/") + ".class";
         InputStream is = this.getResourceAsStream(name);
         if (is == null) {
             return null;
@@ -446,7 +405,7 @@ public class ApplicationClassloader extends ClassLoader {
                 }
 
             } else {
-                long start=System.currentTimeMillis();
+
                 if (!Play.pluginCollection.compileSources()) {
 
                     List<ApplicationClass> all = new ArrayList<ApplicationClass>();
@@ -454,7 +413,6 @@ public class ApplicationClassloader extends ClassLoader {
                     for (VirtualFile virtualFile : Play.javaPath) {
                         all.addAll(getAllClasses(virtualFile));
                     }
-                    Logger.info("Compile %s classes...", all.size());
                     List<String> classNames = new ArrayList<String>();
                     for (int i = 0; i < all.size(); i++) {
                         ApplicationClass applicationClass = all.get(i);
@@ -464,11 +422,9 @@ public class ApplicationClassloader extends ClassLoader {
                     }
 
                     Play.classes.compiler.compile(classNames.toArray(new String[classNames.size()]));
-                    Logger.info("Done.Compiled %s classes. Took %s msec.", all.size(),System.currentTimeMillis()-start);
 
                 }
-                start=System.currentTimeMillis();
-                Logger.info("Loading %s classes...", Play.classes.all().size());
+
                 for (ApplicationClass applicationClass : Play.classes.all()) {
                     Class clazz = loadApplicationClass(applicationClass.name);
                     if (clazz != null) {
@@ -482,7 +438,6 @@ public class ApplicationClassloader extends ClassLoader {
                         return o1.getName().compareTo(o2.getName());
                     }
                 });
-                Logger.info("Done.Loaded %s classes. Took %s msec.", Play.classes.all().size(), System.currentTimeMillis() - start);
             }
         }
         return allClasses;
@@ -495,18 +450,10 @@ public class ApplicationClassloader extends ClassLoader {
      * @return A list of class
      */
     public List<Class> getAssignableClasses(Class clazz) {
-        if(InternalCache.isEnableAssignableClasses()) {
-            List<Class> assignableClasses = InternalCache.getAssignableClasses(clazz);
-            if (assignableClasses != null) return assignableClasses;
-        }
         getAllClasses();
         List<Class> results = new ArrayList<Class>();
         for (ApplicationClass c : Play.classes.getAssignableClasses(clazz)) {
             results.add(c.javaClass);
-        }
-        //TODO: add cache for: clazz.getName->results, we need this to speed up binding in particular.
-        if(InternalCache.isEnableAssignableClasses()) {
-            InternalCache.cacheAssignableClasses(clazz, results);
         }
         return results;
     }

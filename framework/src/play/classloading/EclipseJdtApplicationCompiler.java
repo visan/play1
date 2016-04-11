@@ -168,10 +168,6 @@ public class EclipseJdtApplicationCompiler implements ApplicationCompiler {
             }
 
             private NameEnvironmentAnswer findType(final String name) {
-//                if (Logger.isTraceEnabled()) {
-//                  Logger.trace("findType: %s", name);
-//                }
-//                System.out.println("findType: "+name);
                 try {
 
                     if (name.startsWith("play.") || name.startsWith("java.") || name.startsWith("javax.")) {
@@ -214,7 +210,6 @@ public class EclipseJdtApplicationCompiler implements ApplicationCompiler {
             }
 
             public boolean isPackage(char[][] parentPackageName, char[] packageName) {
-
                 // Rebuild something usable
                 StringBuilder sb = new StringBuilder();
                 if (parentPackageName != null) {
@@ -225,7 +220,6 @@ public class EclipseJdtApplicationCompiler implements ApplicationCompiler {
                 }
                 sb.append(new String(packageName));
                 String name = sb.toString();
-//                System.out.println("isPackage: "+name);
                 if (packagesCache.containsKey(name)) {
                     return packagesCache.get(name).booleanValue();
                 }

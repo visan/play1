@@ -1,28 +1,12 @@
 package play;
 
-import java.lang.annotation.Annotation;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicLong;
-
 import play.Play.Mode;
 import play.exceptions.PlayException;
 import play.exceptions.UnexpectedException;
 import play.libs.F;
 import play.libs.F.Promise;
-import play.utils.NumberConverter;
 import play.utils.PThreadFactory;
 
 import java.lang.annotation.Annotation;
@@ -34,30 +18,19 @@ import java.util.concurrent.*;
  */
 public class Invoker {
 
-    private static final String IVK_EXECUTOR_QUEUE_MONITOR_HKEY = "IVK_POOL_QUEUE";
-    private static final String IVK_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY = "IVK_POOL_ACTIVE_COUNT";
-    private static final String IVK_EXECUTOR_TASK_COUNT_MONITOR_HKEY = "IVK_POOL_TASK_COUNT";
-    private static final String IVK_EXECUTOR_POOL_SIZE_MONITOR_HKEY = "IVK_POOL_POOL_SIZE";
     /**
      * Main executor for requests invocations.
      */
     public static ScheduledThreadPoolExecutor executor = null;
-
-    private static void updateInvokerPoolMonitors() {
-        MonitorFactory.getMonitor(IVK_EXECUTOR_QUEUE_MONITOR_HKEY, "elmts.")       .add(Invoker.executor.getQueue().size());
-        MonitorFactory.getMonitor(IVK_EXECUTOR_ACTIVE_COUNT_MONITOR_HKEY, "elmts.").add(Invoker.executor.getActiveCount());
-        MonitorFactory.getMonitor(IVK_EXECUTOR_TASK_COUNT_MONITOR_HKEY, "elmts.")  .add(Invoker.executor.getTaskCount());
-        MonitorFactory.getMonitor(IVK_EXECUTOR_POOL_SIZE_MONITOR_HKEY, "elmts.")   .add(Invoker.executor.getPoolSize());
-    }
 
     /**
      * Run the code in a new thread took from a thread pool.
      * @param invocation The code to run
      * @return The future object, to know when the task is completed
      */
-
     public static Future<?> invoke(final Invocation invocation) {
-        updateInvokerPoolMonitors();
+        Monitor monitor = MonitorFactory.getMonitor("Invoker queue size", "elmts.");
+        monitor.add(executor.getQueue().size());
         invocation.waitInQueue = MonitorFactory.start("Waiting for execution");
         return executor.submit(invocation);
     }
@@ -69,7 +42,8 @@ public class Invoker {
      * @return The future object, to know when the task is completed
      */
     public static Future<?> invoke(final Invocation invocation, long millis) {
-        updateInvokerPoolMonitors();
+        Monitor monitor = MonitorFactory.getMonitor("Invocation queue", "elmts.");
+        monitor.add(executor.getQueue().size());
         return executor.schedule(invocation, millis, TimeUnit.MILLISECONDS);
     }
 
@@ -182,19 +156,7 @@ public class Invoker {
      * An Invocation in something to run in a Play! context
      */
     public static abstract class Invocation implements Runnable {
-        private final String invokationId;
 
-        public static final String IVK = "IVK";
-      private static volatile AtomicLong nodeLocalInvocationCounter = new AtomicLong();
-
-        public Invocation() {
-            this.invokationId = NumberConverter.toStringExt(nodeLocalInvocationCounter.incrementAndGet());
-          //()new BigInteger(this.hashCode()+"").toString(Character.MAX_RADIX)
-        }
-
-        public String getInvocationId() {
-            return invokationId;
-        }
         /**
          * If set, monitor the time the invocation waited in the queue
          */
@@ -347,7 +309,7 @@ public class Invoker {
      */
     static {
         int core = Integer.parseInt(Play.configuration.getProperty("play.pool", Play.mode == Mode.DEV ? "1" : ((Runtime.getRuntime().availableProcessors() + 1) + "")));
-        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("pl"), new ThreadPoolExecutor.AbortPolicy());
+        executor = new ScheduledThreadPoolExecutor(core, new PThreadFactory("play"), new ThreadPoolExecutor.AbortPolicy());
     }
 
     /**

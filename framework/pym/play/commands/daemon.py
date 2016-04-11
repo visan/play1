@@ -49,9 +49,7 @@ def start(app, args):
     if not sysout:
         sout = None
     else:
-        soutPath=os.path.join(app.log_path(), 'system.out')
-        print "Sysout path is: %s" % soutPath
-        sout = open(soutPath, 'w')
+        sout = open(os.path.join(app.log_path(), 'system.out'), 'w')
     try:
         pid = subprocess.Popen(app.java_cmd(args), stdout=sout, env=os.environ).pid
     except OSError:

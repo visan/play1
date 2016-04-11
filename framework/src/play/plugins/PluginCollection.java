@@ -105,8 +105,7 @@ public class PluginCollection {
      * Enable found plugins
      */
     public void loadPlugins() {
-        long start=System.currentTimeMillis();
-        Logger.info("Loading plugins...");
+        Logger.trace("Loading plugins");
         // Play! plugins
         Enumeration<URL> urls = null;
         try {
@@ -144,13 +143,12 @@ public class PluginCollection {
         Collections.sort(pluginsToLoad);
 
         for (LoadingPluginInfo info : pluginsToLoad) {
-            long start1=System.currentTimeMillis();
             Logger.trace("Loading plugin %s", info.name);
             try {
                 PlayPlugin plugin = (PlayPlugin)Play.classloader.loadClass(info.name).newInstance();
                 plugin.index = info.index;
                 if (addPlugin(plugin)) {
-                    Logger.info("Took %-5s msec to load plugin %s", System.currentTimeMillis()-start1,plugin);
+                    Logger.trace("Plugin %s loaded", plugin);
                 } else {
                     Logger.warn("Did not load plugin %s. Already loaded", plugin);
                 }
@@ -170,7 +168,7 @@ public class PluginCollection {
 
         // Must update Play.plugins-list one last time
         updatePlayPluginsList();
-        Logger.info("Loaded plugins. Took %s msec.",System.currentTimeMillis()-start);
+
     }
 
     /**
@@ -225,7 +223,6 @@ public class PluginCollection {
      */
     @SuppressWarnings({"deprecation"})
     protected void initializePlugin(PlayPlugin plugin) {
-        long start=System.currentTimeMillis();
         Logger.trace("Initializing plugin " + plugin);
         // We're ready to call onLoad for this plugin.
         // must create a unique Play.plugins-list for this onLoad-method-call so
@@ -241,7 +238,6 @@ public class PluginCollection {
                 disablePlugin( enabledPlugin);
             }
         }
-        Logger.info(String.format("Took %-5s msec to initialize %s",System.currentTimeMillis()-start,plugin));
     }
 
 

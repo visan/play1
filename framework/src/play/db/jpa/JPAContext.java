@@ -4,24 +4,19 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.PersistenceException;
 
-import org.slf4j.LoggerFactory;
-import play.Logger;
 import play.exceptions.JPAException;
 
 /**
  * JPA Support
  */
 public class JPAContext {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(JPAContext.class.getName());
 
     private JPAConfig jpaConfig;
     private EntityManager entityManager;
     private boolean readonly = true;
-  private long startTs;
-  private int batchCount;
 
     protected JPAContext(JPAConfig jpaConfig, boolean readonly, boolean beginTransaction) {
-        batchCount = 0;
+
         this.jpaConfig = jpaConfig;
 
         EntityManager manager = jpaConfig.newEntityManager();
@@ -30,8 +25,6 @@ public class JPAContext {
 
         if (beginTransaction) {
             manager.getTransaction().begin();
-          startTs = System.currentTimeMillis();
-            log.trace("tx[{}]: begined. ({})",jpaConfig.getConfigName(),readonly?"ro":"rw");
         }
 
         entityManager = manager;
@@ -47,16 +40,14 @@ public class JPAContext {
      * @param rollback shall current transaction be committed (false) or cancelled (true)
      */
     public void closeTx(boolean rollback) {
-      long duration=System.currentTimeMillis()-startTs;
+
         try {
             if (entityManager.getTransaction().isActive()) {
                 if (readonly || rollback || entityManager.getTransaction().getRollbackOnly()) {
                     entityManager.getTransaction().rollback();
-                    log.trace("tx[{}]: rollbacked.(Took {} ms.) Reason: {}",jpaConfig.getConfigName(),duration,readonly?"ro":"rb");
                 } else {
                     try {
                         entityManager.getTransaction().commit();
-                        log.trace("tx[{}]: commited.(Took {} ms.)",jpaConfig.getConfigName(),duration);
                     } catch (Throwable e) {
                         for (int i = 0; i < 10; i++) {
                             if (e instanceof PersistenceException && e.getCause() != null) {
@@ -68,11 +59,9 @@ public class JPAContext {
                                 break;
                             }
                         }
-                        throw new JPAException("Cannot commit.(Took "+duration+" ms.)", e);
+                        throw new JPAException("Cannot commit", e);
                     }
                 }
-            }else {
-                log.trace("tx[{}]: is NOT active. Nothing to commit.(Took {} ms.)",jpaConfig.getConfigName(),duration);
             }
         } finally {
             entityManager.close();
@@ -113,13 +102,5 @@ public class JPAContext {
      */
     public boolean isInsideTransaction() {
         return entityManager.getTransaction() != null;
-    }
-
-  public int getBatchCount() {
-    return batchCount;
-  }
-
-  public void increaseBatch() {
-      batchCount++;
     }
 }
