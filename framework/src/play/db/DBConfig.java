@@ -2,12 +2,9 @@ package play.db;
 
 import com.mchange.v2.c3p0.*;
 import com.sun.rowset.CachedRowSetImpl;
-
 import jregex.Matcher;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.internal.SessionImpl;
-
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
@@ -21,7 +18,6 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -33,9 +29,7 @@ import java.sql.DriverPropertyInfo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.ConnectionCustomizer;
@@ -126,7 +120,7 @@ public class DBConfig {
 
     /**
      * Execute an SQL update
-     * 
+     *
      * @param SQL
      * @return false if update failed
      */
@@ -147,7 +141,7 @@ public class DBConfig {
 
     /**
      * Execute an SQL query
-     * 
+     *
      * @param SQL
      * @return The rowSet of the query
      */
@@ -251,15 +245,15 @@ public class DBConfig {
 
                 boolean isJndiDatasource = false;
                 String datasourceName = p.getProperty(propsPrefix, "");
-                
-                // Identify datasource JNDI lookup name by 'jndi:' or 'java:' prefix 
+
+                // Identify datasource JNDI lookup name by 'jndi:' or 'java:' prefix
                 if (datasourceName.startsWith("jndi:")) {
                     datasourceName = datasourceName.substring("jndi:".length());
                     isJndiDatasource = true;
                 }
-                
+
                 if (isJndiDatasource || datasourceName.startsWith("java:")) {
-                    
+
                     Context ctx = new InitialContext();
                     datasource = (DataSource) ctx.lookup(datasourceName);
 
@@ -296,7 +290,8 @@ public class DBConfig {
                     ds.setAcquireIncrement(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireIncrement", "3")));//acquireIncrement
                     ds.setAcquireRetryAttempts(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryAttempts", "10")));//acquireRetryAttempts
                     ds.setAcquireRetryDelay(Integer.parseInt(p.getProperty(propsPrefix + ".pool.acquireRetryDelay", "1000")));//acquireRetryDelay
-                    ds.setInitialPoolSize(Integer.parseInt(p.getProperty(propsPrefix + ".pool.initialPoolSize", "3")));//initialPoolSize
+                    int initialPoolSize = Integer.parseInt(p.getProperty(propsPrefix + ".pool.initialPoolSize", "3"));
+                    ds.setInitialPoolSize(initialPoolSize);//initialPoolSize
 
 
                     ds.setCheckoutTimeout(Integer.parseInt(p.getProperty(propsPrefix + ".pool.timeout", "5000")));//checkoutTimeout
@@ -370,14 +365,22 @@ usesTraditionalReflectiveProxies
                     datasource = ds;
                     url = ds.getJdbcUrl();
                   //commended in order to decrease aquire timeout to 1 millsec.
-//                    Connection c = null;
-//                    try {
-//                        c = ds.getConnection();
-//                    } finally {
-//                        if (c != null) {
-//                            c.close();
-//                        }
-//                    }
+                  if (initialPoolSize != 0) {
+                      List<Connection> list = new ArrayList<Connection>();
+                      //force establish connections to db before application start.
+                      Logger.info("Warming up pool %s  -  %s to %s", propsPrefix, ds.getJdbcUrl(), initialPoolSize);
+                      try {
+                          for (int i = 0; i < initialPoolSize; i++) {
+                              Connection c = ds.getConnection();
+                              if (null != c) list.add(c);
+                          }
+                      }catch (Exception ignore){}
+                      //release connections
+                      Logger.info("Pool %s warmed up. initialPoolSize: %s, actual numConn: %s, freeing...", propsPrefix,initialPoolSize, ds.getNumConnections());
+                      for (Connection aList : list) {
+                          aList.close();
+                      }
+                  }
                     Logger.info("Connected to %s", ds.getJdbcUrl());
 
                 }
@@ -476,13 +479,13 @@ usesTraditionalReflectiveProxies
             String password = m.group("pwd");
             String name = m.group("name");
             String parameters = m.group("parameters");
-    		
+
             Map<String, String> paramMap = new HashMap<String, String>();
             paramMap.put("useUnicode", "yes");
             paramMap.put("characterEncoding", "UTF-8");
             paramMap.put("connectionCollation", "utf8_general_ci");
             addParameters(paramMap, parameters);
-            
+
             p.put(propsPrefix+".driver", "com.mysql.jdbc.Driver");
             p.put(propsPrefix+".url", "jdbc:mysql://localhost/" + name + "?" + toQueryString(paramMap));
             if (user != null) {
@@ -526,7 +529,7 @@ usesTraditionalReflectiveProxies
 
         return false;
     }
-    
+
     private static void addParameters(Map<String, String> paramsMap, String urlQuery) {
     	if (!StringUtils.isBlank(urlQuery)) {
 	    	String[] params = urlQuery.split("[\\&]");
@@ -538,7 +541,7 @@ usesTraditionalReflectiveProxies
 			}
     	}
     }
-    
+
     private static String toQueryString(Map<String, String> paramMap) {
     	StringBuilder builder = new StringBuilder();
     	for (Map.Entry<String, String> entry : paramMap.entrySet()) {
