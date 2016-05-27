@@ -201,6 +201,7 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   }
 
   public V call() {
+    if(!checkRunnable()) return null;
     if(waitInQueueMonitor!=null)
     {
       waitInQueueMonitor.stop();
@@ -248,6 +249,14 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
       MDC.remove(Invoker.Invocation.IVK);
     }
     return null;
+  }
+
+  /**
+   * Check if the instance of the job is eligible to run on this play instance. For cluster support.
+   * @return
+   */
+  protected boolean checkRunnable() {
+    return true;
   }
 
   @Override
