@@ -293,7 +293,7 @@ public class Play {
         roots.add(appRoot);
         javaPath = new CopyOnWriteArrayList<VirtualFile>();
         javaPath.add(appRoot.child("app"));
-        javaPath.add(appRoot.child("conf"));
+        javaPath.add(VirtualFile.open(Play.applicationConfDirPath.getAbsolutePath()));//appRoot.child("conf")
 
         // Build basic templates path
         if (appRoot.child("app/views").exists() || (usePrecompiled && appRoot.child("precompiled/templates/app/views").exists())) {
@@ -304,7 +304,7 @@ public class Play {
         }
 
         // Main route file
-        routes = appRoot.child("conf/routes");
+        routes = VirtualFile.open(Play.applicationConfDirPath.getAbsolutePath()+"/routes");//appRoot.child("conf/routes");
 
         // Plugin route files
         modulesRoutes = new HashMap<String, VirtualFile>(16);

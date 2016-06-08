@@ -57,31 +57,10 @@ public class Logger {
      * Try to init stuff.
      */
     public static void init() {
-
-        String log4jPath = Play.configuration.getProperty("application.log.path", "/log4j.xml");
-        URL log4jConf = Logger.class.getResource(log4jPath);
-        boolean isXMLConfig = log4jPath.endsWith(".xml");
-        if (log4jConf == null) { // try again with the .properties
-            isXMLConfig = false;
-            log4jPath = Play.configuration.getProperty("application.log.path", "/log4j.properties");
-            log4jConf = Logger.class.getResource(log4jPath);
-        }
-        if (log4jConf == null) {
-            Properties shutUp = new Properties();
-            shutUp.setProperty("log4j.rootLogger", "OFF");
-            PropertyConfigurator.configure(shutUp);
-        } else if (Logger.log4j == null) {
-
-            if(log4jConf.getFile().indexOf(Play.applicationPath.getAbsolutePath()) == 0 ) {
-                // The log4j configuration file is located somewhere in the application folder,
-                // so it's probably a custom configuration file
+      if (Logger.log4j == null) {
+        String log4jPath = Play.configuration.getProperty("application.log.path");
                 configuredManually = true;
-            }
-            if (isXMLConfig) {
-                DOMConfigurator.configure(log4jConf);
-            } else {
-                PropertyConfigurator.configure(log4jConf);
-            }
+                DOMConfigurator.configure(log4jPath);
             Logger.log4j = LoggerFactory.getLogger("play");
             // In test mode, append logs to test-result/application.log
             if (Play.runningInTestMode()) {
