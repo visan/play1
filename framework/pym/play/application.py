@@ -163,7 +163,8 @@ class PlayApplication(object):
         classpath = []
 
         # The default
-        classpath.append(os.path.normpath(os.path.join(self.path, 'conf')))
+        print "Infere conf dir 1..."
+        classpath.append(os.path.normpath(os.getenv('application_confdir_path', os.path.join(self.path, 'conf', ))))
         classpath.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'framework/play-%s.jar' % self.play_env['version'])))
 
         # The application - recursively add jars to the classpath inside the lib folder to allow for subdirectories
@@ -215,7 +216,8 @@ class PlayApplication(object):
         classpath = []
 
         # The default
-        classpath.append(os.path.normpath(os.path.join(self.path, 'conf')))
+        print "Infere conf dir 2..."
+        classpath.append(os.path.normpath(os.getenv('application_confdir_path', os.path.join(self.path, 'conf', ))))
         classpath.append(os.path.normpath(os.path.join(self.play_env["basedir"], 'framework/play-%s.jar' % self.play_env['version'])))
 
         # The framework

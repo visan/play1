@@ -347,6 +347,7 @@ public class Play {
           Logger.warn("You're running Play! in DEV mode");
         }
       }catch (Exception e){  //fail to start.
+        Logger.error("Error while starting up...",e);
         started=true;//set back true to unblock stop method body.
         stop();
         throw new RuntimeException(e);
