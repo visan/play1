@@ -201,16 +201,17 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
   }
 
   public V call() {
-    if(!checkRunnable()) return null;
-    if(waitInQueueMonitor!=null)
-    {
-      waitInQueueMonitor.stop();
-      waitInQueueMonitor=null;
-    }
-    long startTs = System.currentTimeMillis();
     Monitor monitor = null;
-    MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
+    long startTs = System.currentTimeMillis();
+    boolean isRunnable = checkRunnable();
     try {
+      if(!isRunnable) return null;
+      if(waitInQueueMonitor!=null)
+      {
+        waitInQueueMonitor.stop();
+        waitInQueueMonitor=null;
+      }
+      MDC.put(Invoker.Invocation.IVK, this.getInvocationId());
       if (init()) {
 
         before();
@@ -244,7 +245,9 @@ public class Job<V> extends Invoker.Invocation implements Callable<V> {
         monitor.stop();
       }
       long duration = System.currentTimeMillis() - startTs;
-      log.trace("< {} (Took: {} ms.)", composeEffHkey(), duration);
+      if(isRunnable) {
+        log.trace("< {} (Took: {} ms.)", composeEffHkey(), duration);
+      }
       _finally();
       MDC.remove(Invoker.Invocation.IVK);
     }
