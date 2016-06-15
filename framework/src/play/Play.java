@@ -86,7 +86,7 @@ public class Play {
     /**
      * The application conf dir path
      */
-    private static File applicationConfDirPath = null;
+    public static File applicationConfDirPath = null;
 
     /**
      * tmp dir

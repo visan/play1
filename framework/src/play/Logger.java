@@ -58,7 +58,7 @@ public class Logger {
      */
     public static void init() {
       if (Logger.log4j == null) {
-        String log4jPath = Play.configuration.getProperty("application.log.path");
+        String log4jPath = Play.configuration.getProperty("application.log.path",Play.applicationConfDirPath.getAbsolutePath()+"/log4j.xml");
                 configuredManually = true;
                 DOMConfigurator.configure(log4jPath);
             Logger.log4j = LoggerFactory.getLogger("play");
