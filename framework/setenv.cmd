@@ -18,6 +18,7 @@ set fedorov_TOOLS_HOME=D:\OPK\trunk\tools
 set akhmetov_TOOLS_HOME=D:\upc2-____-infra\trunk\tools
 set estartseva_TOOLS_HOME=D:\workspace\upc2\upc-upc2-infra\trunk\tools
 set kipenko_TOOLS_HOME=C:\projects\_upc2-____-infra\trunk\tools
+set plizga_TOOLS_HOME=E:\Projects\upc2\upc-upc2-infra\trunk\tools
 rem Add your path here.
 
 set TOOLS_HOME=!%ENV_NAME%_TOOLS_HOME!
@@ -44,6 +45,7 @@ set fedorov_JAVA_HOME=c:\Program Files\Java\jdk1.6.0_37
 set akhmetov_JAVA_HOME=D:\jdk1.6.0_45
 set estartseva_JAVA_HOME=C:\Program Files\Java\jdk1.6.0_45
 set kipenko_JAVA_HOME=C:\Program Files\Java\jdk1.6.0_37
+set plizga_JAVA_HOME=E:\Dist\jdk1.8.0_92_patched
 rem Add your path here.
 
 set JAVA_HOME=!%ENV_NAME%_JAVA_HOME!
