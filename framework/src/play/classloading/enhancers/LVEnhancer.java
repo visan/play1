@@ -1,18 +1,5 @@
 package play.classloading.enhancers;
 
-import java.util.Arrays;
-import java.util.Stack;
-
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.Modifier;
-import javassist.NotFoundException;
-import javassist.bytecode.BadBytecode;
-import javassist.bytecode.Bytecode;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.Opcode;
-import javassist.compiler.CompileError;
 import bytecodeparser.analysis.decoders.DecodedMethodInvocationOp;
 import bytecodeparser.analysis.decoders.DecodedMethodInvocationOp.MethodParams;
 import bytecodeparser.analysis.opcodes.ExitOpcode;
@@ -21,13 +8,27 @@ import bytecodeparser.analysis.stack.StackAnalyzer.Frame;
 import bytecodeparser.analysis.stack.StackAnalyzer.Frames;
 import bytecodeparser.analysis.stack.StackAnalyzer.Frames.FrameIterator;
 import bytecodeparser.utils.Utils;
+import javassist.*;
+import javassist.bytecode.BadBytecode;
+import javassist.bytecode.Bytecode;
+import javassist.bytecode.CodeAttribute;
+import javassist.bytecode.Opcode;
+import javassist.compiler.CompileError;
 import play.Logger;
-import play.Play;
 import play.classloading.ApplicationClasses.ApplicationClass;
 import play.exceptions.UnexpectedException;
-import play.libs.Codec;
+
+import java.util.Arrays;
+import java.util.Stack;
 
 public class LVEnhancer extends Enhancer {
+
+    /**
+     * Due to several drawbacks of enhancing source code by this enhancer, it should be kept disabled by this property.
+     * @see <a href="https://jira.ftc.ru/browse/UPCSEC-3377">UPCSEC-3377</a>
+     */
+    public static final boolean ENABLED = Boolean.getBoolean("play.classloading.enhancers.LVEnhancer.enabled");
+
     @Override
     public void enhanceThisClass(ApplicationClass applicationClass)
             throws Exception {
