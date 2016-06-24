@@ -57,9 +57,12 @@ public class Logger {
      * Try to init stuff.
      */
     public static void init() {
-      if (Logger.log4j == null) {
+      if (Logger.log4j != null) {
+        System.out.println("Logger.init: Log configuration is not null. skip.");
+      }else {
         String log4jPath = Play.configuration.getProperty("application.log.path",Play.applicationConfDirPath.getAbsolutePath()+"/log4j.xml");
-                configuredManually = true;
+        System.out.println("Logger.init: Log configuration is null. Configuring from: "+log4jPath);
+        configuredManually = true;
                 DOMConfigurator.configure(log4jPath);
             Logger.log4j = LoggerFactory.getLogger("play");
             // In test mode, append logs to test-result/application.log
