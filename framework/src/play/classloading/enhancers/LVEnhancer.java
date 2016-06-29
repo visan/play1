@@ -32,6 +32,8 @@ public class LVEnhancer extends Enhancer {
     @Override
     public void enhanceThisClass(ApplicationClass applicationClass)
             throws Exception {
+        if (!ENABLED) return;
+
         CtClass ctClass = makeClass(applicationClass);
         if(ctClass.isAnnotation() || ctClass.isInterface())
             return;
