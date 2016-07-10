@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import org.apache.commons.logging.Log;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.PatternLayout;
@@ -51,37 +53,43 @@ public class Logger {
      * true if logger is configured manually (log4j-config file supplied by application)
      */
     public static boolean configuredManually = false;
-    public static org.slf4j.Logger log4j = LoggerFactory.getLogger("play");
+    public static volatile org.slf4j.Logger log4j = LoggerFactory.getLogger("play");
+    public static boolean isFirstInit = true;
 
     /**
      * Try to init stuff.
      */
     public static void init() {
-      if (Logger.log4j != null) {
+      if(!isFirstInit&&log4j!=null) {
         System.out.println("Logger.init: Log configuration is not null. skip.");
-      }else {
-        String log4jPath = Play.configuration.getProperty("application.log.path",Play.applicationConfDirPath.getAbsolutePath()+"/log4j.xml");
-        System.out.println("Logger.init: Log configuration is null. Configuring from: "+log4jPath);
-        configuredManually = true;
-                DOMConfigurator.configure(log4jPath);
-            Logger.log4j = LoggerFactory.getLogger("play");
-            // In test mode, append logs to test-result/application.log
-            if (Play.runningInTestMode()) {
-                org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
-                try {
-                    if (!Play.getFile("test-result").exists()) {
-                        Play.getFile("test-result").mkdir();
-                    }
-                    Appender testLog = new FileAppender(new PatternLayout("%d{DATE} %-5p ~ %m%n"), Play.getFile("test-result/application.log").getAbsolutePath(), false);
-                    rootLogger.addAppender(testLog);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        return;
+      }
+      reloadConfiguration();
+      isFirstInit = false;
     }
 
-    /**
+  public static void reloadConfiguration() {
+    String log4jPath = Play.configuration.getProperty("application.log.path",Play.applicationConfDirPath.getAbsolutePath()+"/log4j.xml");
+    System.out.println("Logger: Log configuration is reloading.... Configuring from: "+log4jPath);
+    configuredManually = true;
+    DOMConfigurator.configure(log4jPath);
+    log4j = LoggerFactory.getLogger("play");
+    // In test mode, append logs to test-result/application.log
+    if (Play.runningInTestMode()) {
+      org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
+      try {
+        if (!Play.getFile("test-result").exists()) {
+          Play.getFile("test-result").mkdir();
+        }
+        Appender testLog = new FileAppender(new PatternLayout("%d{DATE} %-5p ~ %m%n"), Play.getFile("test-result/application.log").getAbsolutePath(), false);
+        rootLogger.addAppender(testLog);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  /**
      * Force logger to a new level.
      * @param level TRACE,DEBUG,INFO,WARN,ERROR,FATAL
      */
