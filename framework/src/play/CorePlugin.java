@@ -5,26 +5,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.jamonapi.MonitorFactory;
 import com.jamonapi.utils.Misc;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.commons.lang.StringUtils;
 import play.Play.Mode;
 import play.classloading.ApplicationClasses.ApplicationClass;
-import play.classloading.enhancers.ContinuationEnhancer;
-import play.classloading.enhancers.ControllersEnhancer;
-import play.classloading.enhancers.Enhancer;
-import play.classloading.enhancers.LVEnhancer;
-import play.classloading.enhancers.MailerEnhancer;
-import play.classloading.enhancers.PropertiesEnhancer;
-import play.classloading.enhancers.SigEnhancer;
+import play.classloading.enhancers.*;
 import play.exceptions.UnexpectedException;
 import play.libs.Crypto;
 import play.mvc.Http.Header;
 import play.mvc.Http.Request;
 import play.mvc.Http.Response;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Plugin used for core tasks
@@ -286,14 +283,16 @@ public class CorePlugin extends PlayPlugin {
 
     @Override
     public void enhance(ApplicationClass applicationClass) throws Exception {
-        Class<?>[] enhancers = new Class[]{
-            PropertiesEnhancer.class,
-            ContinuationEnhancer.class,
-            SigEnhancer.class,         
-            ControllersEnhancer.class,
-            MailerEnhancer.class,
-            LVEnhancer.class
-        };
+        List<Class<?>> enhancers = new ArrayList<>(Arrays.asList(
+                    PropertiesEnhancer.class,
+                    ContinuationEnhancer.class,
+                    SigEnhancer.class,
+                    ControllersEnhancer.class,
+                    MailerEnhancer.class
+                ));
+        if (LVEnhancer.ENABLED) {
+            enhancers.add(LVEnhancer.class);
+        }
         for (Class<?> enhancer : enhancers) {
             try {
                 long start = System.currentTimeMillis();

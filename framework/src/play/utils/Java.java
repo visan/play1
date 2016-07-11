@@ -1,6 +1,5 @@
 package play.utils;
 
-import java.util.Comparator;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.bytecode.SourceFileAttribute;
@@ -11,10 +10,7 @@ import play.data.binding.Binder;
 import play.data.binding.ParamNode;
 import play.data.binding.RootParamNode;
 import play.exceptions.UnexpectedException;
-import play.mvc.After;
-import play.mvc.Before;
-import play.mvc.Finally;
-import play.mvc.With;
+import play.mvc.*;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
@@ -25,8 +21,8 @@ import java.util.*;
 import java.util.concurrent.FutureTask;
 
 import static java.util.Collections.addAll;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static java.util.Collections.sort;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * Java utils
@@ -216,7 +212,9 @@ public class Java {
     }
 
     /**
-     * Retrieve parameter names of a method
+     * Retrieve parameter names of a method.<br/>
+     * If the names are absent (LVEnhancer was disabled at the precompilation time), they will be treated equal to the
+     * names of actual parameters.
      */
     public static String[] parameterNames(Method method) throws Exception {
         try {
@@ -229,7 +227,10 @@ public class Java {
             }*/
             return (String[]) method.getDeclaringClass().getDeclaredField("$" + method.getName() + LVEnhancer.computeMethodHash(method.getParameterTypes())).get(null);
         } catch (Exception e) {
-            throw new UnexpectedException("Cannot read parameter names for " + method, e);
+            /* In case LVEnhancer was turned off we fully rely on actual parameters' names. */
+            return Scope.Params.current().all()
+                    .keySet().stream()
+                    .toArray(String[]::new);
         }
     }
 
