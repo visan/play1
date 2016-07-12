@@ -300,7 +300,7 @@ public class CorePlugin extends PlayPlugin {
                 if (Logger.isTraceEnabled()) {
                     Logger.trace("%sms to apply %s to %s", System.currentTimeMillis() - start, enhancer.getSimpleName(), applicationClass.name);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {//just Exception is not enough because java.lang.IncompatibleClassChangeError is thrown
                 throw new UnexpectedException("While applying " + enhancer + " on " + applicationClass.name, e);
             }
         }
