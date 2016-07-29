@@ -2,6 +2,7 @@ package play.libs;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.util.Iterator;
 import java.util.List;
@@ -45,38 +46,13 @@ public class Crypto {
 
     private static Provider provider;
     static {
-//        System.out.println("getProviders: "+Providers.getSunProvider().getName());
-//        ProviderList list = Providers.getFullProviderList();
-//        List<Provider> providerList=list.providers();
-//        for (Provider provider1 : providerList) {
-//            System.out.println(provider1.getName());
-//        }
-
-
-        List var1 = GetInstance.getServices("Mac", HMACSHA1_CONST);
-        Iterator var2 = var1.iterator();
-
-        Provider.Service var3;
-        do {
-            if(!var2.hasNext()) {
-                throw new RuntimeException("Algorithm " + HMACSHA1_CONST + " not available");
-            }
-
-            var3 = (Provider.Service)var2.next();
-            provider = var3.getProvider();
-//            System.out.println(provider.getName());
-        } while(searchAppropriateProvider(provider));
+        try {
+            provider = Mac.getInstance(/*algo=*/ "HmacSHA1").getProvider();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private static boolean searchAppropriateProvider(Provider provider) {
-        boolean result = true;
-        if(provider.getName().equals("SunJCE")) return false;
-        return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println("HI: "+provider.getName());
-    }
     /**
      * Sign a message using the application secret key (HMAC-SHA1)
      */
