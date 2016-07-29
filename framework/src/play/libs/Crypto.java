@@ -2,6 +2,9 @@ package play.libs;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -11,11 +14,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import play.Play;
 import play.exceptions.UnexpectedException;
+import sun.security.jca.GetInstance;
 
 /**
  * Cryptography utils
  */
 public class Crypto {
+
+    private static final java.lang.String HMACSHA1_CONST = "HmacSHA1";
 
     /**
      * Define a hash type enumeration for strong-typing
@@ -37,6 +43,40 @@ public class Crypto {
 
     static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
+    private static Provider provider;
+    static {
+//        System.out.println("getProviders: "+Providers.getSunProvider().getName());
+//        ProviderList list = Providers.getFullProviderList();
+//        List<Provider> providerList=list.providers();
+//        for (Provider provider1 : providerList) {
+//            System.out.println(provider1.getName());
+//        }
+
+
+        List var1 = GetInstance.getServices("Mac", HMACSHA1_CONST);
+        Iterator var2 = var1.iterator();
+
+        Provider.Service var3;
+        do {
+            if(!var2.hasNext()) {
+                throw new RuntimeException("Algorithm " + HMACSHA1_CONST + " not available");
+            }
+
+            var3 = (Provider.Service)var2.next();
+            provider = var3.getProvider();
+//            System.out.println(provider.getName());
+        } while(searchAppropriateProvider(provider));
+    }
+
+    private static boolean searchAppropriateProvider(Provider provider) {
+        boolean result = true;
+        if(provider.getName().equals("SunJCE")) return false;
+        return result;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("HI: "+provider.getName());
+    }
     /**
      * Sign a message using the application secret key (HMAC-SHA1)
      */
@@ -58,8 +98,8 @@ public class Crypto {
         }
 
         try {
-            Mac mac = Mac.getInstance("HmacSHA1");
-            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
+            Mac mac = Mac.getInstance(HMACSHA1_CONST, provider);
+            SecretKeySpec signingKey = new SecretKeySpec(key, HMACSHA1_CONST);
             mac.init(signingKey);
             byte[] messageBytes = message.getBytes("utf-8");
             byte[] result = mac.doFinal(messageBytes);
