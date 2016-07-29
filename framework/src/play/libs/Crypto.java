@@ -40,7 +40,7 @@ public class Crypto {
     private static Provider provider;
     static {
         try {
-            provider = Mac.getInstance(/*algo=*/ "HmacSHA1").getProvider();
+            provider = Mac.getInstance(/*algo=*/ HMACSHA1_CONST).getProvider();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
