@@ -2,20 +2,13 @@ package play.libs;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Provider;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.codec.binary.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import play.Play;
 import play.exceptions.UnexpectedException;
-import sun.security.jca.GetInstance;
 
 /**
  * Cryptography utils
