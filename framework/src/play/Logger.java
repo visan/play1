@@ -69,7 +69,13 @@ public class Logger {
     }
 
   public static void reloadConfiguration() {
-    String log4jPath = Play.configuration.getProperty("application.log.path",Play.applicationConfDirPath.getAbsolutePath()+"/log4j.xml");
+    String log4jPath = Play.configuration.getProperty("application.log.path");
+    if(log4jPath==null
+      || log4jPath.equals("/log4j.xml")/*backward compatibility. remove when change is spread.*/
+      ){
+      log4jPath = Play.applicationConfDirPath.getAbsolutePath() + "/log4j.xml";
+    }
+
     System.out.println("Logger: Log configuration is reloading.... Configuring from: "+log4jPath);
     configuredManually = true;
     DOMConfigurator.configure(log4jPath);
